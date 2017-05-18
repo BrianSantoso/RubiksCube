@@ -1,10 +1,19 @@
+import java.util.ArrayList;
 
 public class Face implements CubeComponent {
 	
 	private int[] vertexIndexArray;	
 	
-	public Face(){
+	public Face(ArrayList<Vertex> vertices){
 		
+		vertexIndexArray = new int[vertices.size()];
+		
+		for(int i = 0; i < vertices.size(); i++){
+			
+			Game.renderer.addVertex(vertices.get(i));
+			vertexIndexArray[i] = Game.renderer.getSize() - 1;
+			
+		}
 		
 		
 	}

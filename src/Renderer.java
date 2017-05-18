@@ -18,16 +18,21 @@ public class Renderer {
 		
 		vertices = new ArrayList<Vertex>();
 		
-		test(-6);
-		test(-5);
-		test(-4);
+		// Dummy Cube
+		
+//		test(-6);
+//		test(-5);
+//		test(-4);
 		
 		// Z Buffer Debugging
 		
+//		Vector pos = new Vector(1.5f, 0, -10f);
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, 0), 0.5f, 1, 0x000000));
+//		addVertices(CubeGeometry.constructFaceVertices(pos.minus(new Vector(0.5f, 0.5f, 0)), new EAngle((float) Math.PI/2, (float) Math.PI/2, 0), 0.5f, 1, 0xff0000));
 		
 		// Test Cube
 		
-//		Vector pos = new Vector(1.5f, 0, -5f);
+//		Vector pos = new Vector(1.5f, 0, -10f);
 //		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, 0), 0.5f, 1, 0x000000));
 //		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI/2, 0, 0), 0.5f, 1, 0x000000));
 //		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) (3 * Math.PI/2), 0, 0), 0.5f, 1, 0x000000));
@@ -42,8 +47,18 @@ public class Renderer {
 //		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) Math.PI/2), 1f, 0.8f, 0x00ffff));
 //		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) (3 * Math.PI/2)), 1f, 0.8f, 0xff00ff));
 //		
+		// EAngle Constants Test
 		
-
+//		Vector pos = new Vector(-5, 0, -10);
+//		float radius = 0.5f;
+//		float size = 0.5f;
+//		addVertices(CubeGeometry.constructFaceVertices(pos, EAngle.RIGHT, radius, size, 0xff0000));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, EAngle.UP, radius, size, 0x00ff00));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, EAngle.BACK, radius, size, 0x0000ff));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, EAngle.LEFT, radius, size, 0xffff00));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, EAngle.DOWN, radius, size, 0x00ffff));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, EAngle.FORWARD, radius, size, 0xff00ff));
+		
 		
 		
 		
@@ -408,6 +423,12 @@ public class Renderer {
 		addVertices(CubeGeometry.constructFaceVertices(pos8, new EAngle((float) Math.PI, 0, 0), 0.6f, 0.8f, 0xffff00));
 		addVertices(CubeGeometry.constructFaceVertices(pos8, new EAngle(0, 0, (float) Math.PI/2), 0.6f, 0.8f, 0x00ffff));
 		addVertices(CubeGeometry.constructFaceVertices(pos8, new EAngle(0, 0, (float) (3 * Math.PI/2)), 0.6f, 0.8f, 0xff00ff));
+		
+	}
+
+	public int getSize() {
+		
+		return vertices.size();
 		
 	}
 	

@@ -4,9 +4,9 @@ public class Cublet implements CubeComponent {
 
 	private ArrayList<Face> faces;
 	
-	public Cublet(){
+	public Cublet(ArrayList<Face> faces){
 		
-		
+		this.faces = faces;
 		
 	}
 	

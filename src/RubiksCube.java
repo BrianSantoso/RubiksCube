@@ -2,7 +2,8 @@ import java.util.ArrayList;
 
 public class RubiksCube {
 
-	private final int n;
+	private final int n;	// n x n x n dimensions
+	private final float size; // kind of like a scale
 	
 	private Vector pos;
 	private Vector[] axis;
@@ -14,15 +15,16 @@ public class RubiksCube {
 	private boolean turning;
 	
 	
-	public RubiksCube(int n){
+	public RubiksCube(int n, float size){
 		
 		this.n = n;
+		this.size = size;
 		
-		pos = Vector.ZERO;
+		pos = new Vector(0 ,0, -10);
 		axis = new Vector[]{ Vector.RIGHT, Vector.UP, Vector.BACK }; // might replace forward with backwards and vice versa
 		
 		// 6n^2 - 12n + 8
-		pieces = new Cublet[6 * n * n - 12 * n + 8];
+		
 		
 		//stickerNet = new int[dimensions[1] * 2 + dimensions[0] * 2][dimensions[2] + dimensions[1] * 2];
 		colorScheme = new int[]{
@@ -36,6 +38,8 @@ public class RubiksCube {
 				
 		};
 		
+		pieces = new Cublet[6 * n * n - 12 * n + 8];
+		constructPieces();
 		
 	}
 	
@@ -43,17 +47,51 @@ public class RubiksCube {
 		
 		int index = 0;
 		
+		Vector pivot = pos.plus(new Vector( 
+				
+				-(float)(n - 1)/2,
+				-(float)(n - 1)/2,
+				(float)(n - 1)/2
+				
+		).scale(size));
+		
+		System.out.println(pivot);
+		
 		for(int x = 0; x < n; x++){
 			for(int y = 0; y < n; y++){
 				for(int z = 0; z < n; z++){
 				
 					if(isOnOutside(x, y, z)){
 						
+						Vector pos = pivot.plus(new Vector(x, y, -z).scale(size));
 						ArrayList<Face> facesToAdd = new ArrayList<Face>();
 						
-						pieces[index] = new Cublet();
+						for(int rep = 0; rep < 6; rep++){
+							
+							if(isOnFace(rep, x, y, z)){
+								
+								Face f = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[rep], size/2, size, 0x000000));
+								Sticker s = new Sticker(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[rep], size/2 + 0.1f, size * 0.8f, colorScheme[rep]));
+								
+								facesToAdd.add(f);
+								facesToAdd.add(s);
+							}
+							
+						}
+						
+						
+						
+//						if(isOnFace(0, x, y, z)){
+//							
+//							Face f = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.RIGHT, size, size, colorScheme[0]));
+//							//facesToAdd.add(f);
+//							
+//						}
+						
+						pieces[index] = new Cublet(facesToAdd);
 						
 						index++;
+						//System.out.println(index);
 						
 					}
 					
@@ -76,8 +114,8 @@ public class RubiksCube {
 	
 	public boolean isOnOutside(int x, int y, int z){
 		
-		return x == 0 || x == n - 1 &&
-				y == 0 || y == n - 1 &&
+		return x == 0 || x == n - 1 ||
+				y == 0 || y == n - 1 ||
 				z == 0 || z == n - 1;
 		
 	}

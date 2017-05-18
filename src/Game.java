@@ -28,7 +28,8 @@ public class Game extends Canvas implements Runnable{
 	public static Renderer renderer;
 	private RubiksCube rubiksCube;
 	
-	//private Keyboard keyboard;
+	private Keyboard keyboard;
+	private Mouse mouse;
 	
 	private long now, last;
 	private float dt, accumulation, fps;
@@ -74,9 +75,15 @@ public class Game extends Canvas implements Runnable{
 		frame.setVisible(true);
 		
 		
-		//keyboard = new Keyboard();
-		//addKeyListener(keyboard);
+		keyboard = new Keyboard();
+		addKeyListener(keyboard);
 		
+		mouse = new Mouse(getWidth(), getHeight());
+		
+		addMouseMotionListener(mouse);
+		addMouseListener(mouse);
+		
+		rubiksCube = new RubiksCube(5, 1);
 		
 	}
 	
@@ -101,7 +108,8 @@ public class Game extends Canvas implements Runnable{
 	
 	public void keyInputs(){
 		
-		//keyboard.keyInputs();
+		keyboard.keyInputs();
+		mouse.keyInputs();
 		
 	}
 	
@@ -109,11 +117,13 @@ public class Game extends Canvas implements Runnable{
 		
 		//renderer.update();
 		
-		Matrix rotation = Matrix.yAxisRotationMatrix(1.5f * step);
-		Matrix rotation2 = Matrix.xAxisRotationMatrix(1.5f * step);
-		Matrix rotation3 = Matrix.zAxisRotationMatrix(1.5f * step);
-		Matrix translation1 = Matrix.translationMatrix(0.5f, 0, -10.5f);
-		Matrix translation2 = Matrix.translationMatrix(-0.5f, 0, 10.5f);
+		Matrix rotation = Matrix.yAxisRotationMatrix(1f * step);
+		Matrix rotation2 = Matrix.xAxisRotationMatrix(1f * step);
+		Matrix rotation3 = Matrix.zAxisRotationMatrix(1f * step);
+//		Matrix translation1 = Matrix.translationMatrix(0.5f, 0, -10.5f);
+//		Matrix translation2 = Matrix.translationMatrix(-0.5f, 0, 10.5f);
+		Matrix translation1 = Matrix.translationMatrix(0.0f, 0, -10.0f);
+		Matrix translation2 = Matrix.translationMatrix(-0.0f, 0, 10.0f);
 		Matrix transformation = translation1.multiply(rotation3).multiply(rotation2).multiply(rotation).multiply(translation2);
 		
 		for(Vertex v : renderer.getVertices()){

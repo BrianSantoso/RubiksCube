@@ -1,6 +1,24 @@
 
 public class EAngle {
 
+	public static EAngle UP = new EAngle(0, 0, 0);
+	public static EAngle RIGHT = new EAngle(0, 0, (float) (3 * Math.PI/2));
+	public static EAngle BACK = new EAngle((float) Math.PI/2, 0, 0);
+	public static EAngle FORWARD = new EAngle((float) (3 * Math.PI/2), 0, 0);
+	public static EAngle DOWN = new EAngle((float) Math.PI, 0, 0);
+	public static EAngle LEFT = new EAngle(0, 0, (float) Math.PI/2);
+	
+	public static EAngle[] AXIS_ANGLES = new EAngle[]{
+			
+			RIGHT,	// 0
+			UP,		// 1
+			BACK,	// 2
+			LEFT,	// 3
+			DOWN,	// 4
+			FORWARD	// 5
+			
+	};
+	
 	private float pitch;
 	private float yaw;
 	private float roll;
