@@ -1,7 +1,8 @@
+import java.util.ArrayList;
 
 public class Cublet implements CubeComponent {
 
-	private Face[] faces;
+	private ArrayList<Face> faces;
 	
 	public Cublet(){
 		

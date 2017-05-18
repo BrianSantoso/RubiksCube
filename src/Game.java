@@ -1,6 +1,7 @@
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -30,7 +31,7 @@ public class Game extends Canvas implements Runnable{
 	//private Keyboard keyboard;
 	
 	private long now, last;
-	private float dt, accumulation;
+	private float dt, accumulation, fps;
 	private final float step;
 	
 	public Game(int width, int height, int scale, float step, String title){
@@ -43,6 +44,7 @@ public class Game extends Canvas implements Runnable{
 		now = System.currentTimeMillis();
 		last = 0;
 		dt = 0;
+		fps = 0;
 		accumulation = 0;
 		running = false;
 		
@@ -107,20 +109,12 @@ public class Game extends Canvas implements Runnable{
 		
 		//renderer.update();
 		
-		Matrix rotation = Matrix.yAxisRotationMatrix(0.25f * step);
-		Matrix rotation2 = Matrix.xAxisRotationMatrix(0.25f * step);
-		Matrix rotation3 = Matrix.zAxisRotationMatrix(0.25f * step);
-		Matrix translation1 = Matrix.translationMatrix(0.5f, 0, -5.5f);
-		Matrix translation2 = Matrix.translationMatrix(-0.5f, 0, 5.5f);
+		Matrix rotation = Matrix.yAxisRotationMatrix(1.5f * step);
+		Matrix rotation2 = Matrix.xAxisRotationMatrix(1.5f * step);
+		Matrix rotation3 = Matrix.zAxisRotationMatrix(1.5f * step);
+		Matrix translation1 = Matrix.translationMatrix(0.5f, 0, -10.5f);
+		Matrix translation2 = Matrix.translationMatrix(-0.5f, 0, 10.5f);
 		Matrix transformation = translation1.multiply(rotation3).multiply(rotation2).multiply(rotation).multiply(translation2);
-//		Matrix transformation = new Matrix(new float[][]{
-//			
-//			{1, 0, 0, 0},
-//			{0, 1, 0, 0},
-//			{0, 0, 1, 0},
-//			{0, 0, 0, 1},
-//			
-//		});
 		
 		for(Vertex v : renderer.getVertices()){
 			
@@ -135,7 +129,7 @@ public class Game extends Canvas implements Runnable{
 		
 		BufferStrategy bs = getBufferStrategy();
 		if(bs == null){
-			createBufferStrategy(1);	//triple buffering
+			createBufferStrategy(1);	//use 3 for triple buffering
 			return;
 		}
 		
@@ -150,9 +144,18 @@ public class Game extends Canvas implements Runnable{
 		//g.setColor(Color.WHITE);
 		//g.fillRect(0, 0, getWidth(), getHeight());
 		//g.drawImage(image, 0, getWidth(), getWidth(), -getHeight(), null);
+		
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-		g.dispose(); //remove Graphics from each frame
-		bs.show(); //make next available buffer visible
+		//g.dispose(); //remove Graphics from each frame
+		//bs.show(); //make next available buffer visible
+		
+		g.setColor(Color.RED);
+		Font currentFont = g.getFont();
+		Font newFont = currentFont.deriveFont(currentFont.getSize() * 3f);
+		g.setFont(newFont);
+		g.drawString((int) fps + " fps", 15, 40);
+		
+		//System.out.println(fps + "");
 		
 		renderer.getRaster().clear(0xfafafa);
 		
@@ -166,9 +169,13 @@ public class Game extends Canvas implements Runnable{
 			dt = Math.min((now - last)/1000f, 1);
 			accumulation += dt;
 			
+			fps = 1 / dt;
+			
+			keyInputs();
+			
 			while(accumulation >= step){
 				
-				keyInputs();
+				
 				update();
 				accumulation -= step;
 				
@@ -205,7 +212,7 @@ public class Game extends Canvas implements Runnable{
 		
 		
 		
-		Game game = new Game(800, 800, 2, 1f/60, "Pixels on a Screen");
+		Game game = new Game(800, 800, 1, 1f/60, "Pixels on a Screen");
 		game.start();
 		
 		

@@ -18,29 +18,29 @@ public class Renderer {
 		
 		vertices = new ArrayList<Vertex>();
 		
-		//test(-6);
-		//test(-5);
-		//test(-4);
+		test(-6);
+		test(-5);
+		test(-4);
 		
 		// Z Buffer Debugging
 		
 		
 		// Test Cube
 		
-		Vector pos = new Vector(1.5f, 0, -5f);
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, 0), 0.5f, 1, 0x000000));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI/2, 0, 0), 0.5f, 1, 0x000000));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) (3 * Math.PI/2), 0, 0), 0.5f, 1, 0x000000));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI, 0, 0), 0.5f, 1, 0x000000));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) Math.PI/2), 0.5f, 1, 0x000000));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) (3 * Math.PI/2)), 0.5f, 1, 0x000000));
-		
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, 0), 1f, 0.8f, 0xff0000));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI/2, 0, 0), 1f, 0.8f, 0x000ff00));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) (3 * Math.PI/2), 0, 0), 1f, 0.8f, 0x0000ff));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI, 0, 0), 1f, 0.8f, 0xffff00));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) Math.PI/2), 1f, 0.8f, 0x00ffff));
-		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) (3 * Math.PI/2)), 1f, 0.8f, 0xff00ff));
+//		Vector pos = new Vector(1.5f, 0, -5f);
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, 0), 0.5f, 1, 0x000000));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI/2, 0, 0), 0.5f, 1, 0x000000));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) (3 * Math.PI/2), 0, 0), 0.5f, 1, 0x000000));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI, 0, 0), 0.5f, 1, 0x000000));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) Math.PI/2), 0.5f, 1, 0x000000));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) (3 * Math.PI/2)), 0.5f, 1, 0x000000));
+//		
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, 0), 1f, 0.8f, 0xff0000));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI/2, 0, 0), 1f, 0.8f, 0x000ff00));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) (3 * Math.PI/2), 0, 0), 1f, 0.8f, 0x0000ff));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle((float) Math.PI, 0, 0), 1f, 0.8f, 0xffff00));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) Math.PI/2), 1f, 0.8f, 0x00ffff));
+//		addVertices(CubeGeometry.constructFaceVertices(pos, new EAngle(0, 0, (float) (3 * Math.PI/2)), 1f, 0.8f, 0xff00ff));
 //		
 		
 

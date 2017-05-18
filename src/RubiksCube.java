@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class RubiksCube {
 
@@ -40,7 +41,44 @@ public class RubiksCube {
 	
 	public void constructPieces(){
 		
+		int index = 0;
 		
+		for(int x = 0; x < n; x++){
+			for(int y = 0; y < n; y++){
+				for(int z = 0; z < n; z++){
+				
+					if(isOnOutside(x, y, z)){
+						
+						ArrayList<Face> facesToAdd = new ArrayList<Face>();
+						
+						pieces[index] = new Cublet();
+						
+						index++;
+						
+					}
+					
+				}
+			}
+		}
+		
+	}
+	
+	public boolean isOnFace(int face, int x, int y, int z){
+		
+		if(face == 0) return x == n - 1;
+		else if(face == 1) return y == n - 1;
+		else if(face == 2) return z == 0;
+		else if(face == 3) return x == 0;
+		else if(face == 4) return y == 0;
+		return z == n - 1;
+		
+	}
+	
+	public boolean isOnOutside(int x, int y, int z){
+		
+		return x == 0 || x == n - 1 &&
+				y == 0 || y == n - 1 &&
+				z == 0 || z == n - 1;
 		
 	}
 	

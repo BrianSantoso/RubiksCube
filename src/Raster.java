@@ -100,7 +100,7 @@ public class Raster {
 	public static float[] barycentricWeights(Vector a, Vector b, Vector c, Vector point){
 		
 		float totalArea = areaOfTriangle(a, b, c);
-		float areaOfTriangleA = areaOfTriangle(point, a, c);
+		float areaOfTriangleA = areaOfTriangle(point, b, c); // thanks Joseph
 		float areaOfTriangleB = areaOfTriangle(point, c, a);
 		float areaOfTriangleC = totalArea - areaOfTriangleA - areaOfTriangleB;
 		
