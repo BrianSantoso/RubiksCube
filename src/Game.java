@@ -83,7 +83,8 @@ public class Game extends Canvas implements Runnable{
 		addMouseMotionListener(mouse);
 		addMouseListener(mouse);
 		
-		rubiksCube = new RubiksCube(5, 1);
+		//cc
+		rubiksCube = new RubiksCube(3, 1.4f);
 		
 	}
 	
@@ -110,6 +111,13 @@ public class Game extends Canvas implements Runnable{
 		
 		keyboard.keyInputs();
 		mouse.keyInputs();
+		rubiksCube.keyInputs(mouse);
+		
+		
+			
+		mouse.setDirection(Vector.ZERO);
+		
+		
 		
 	}
 	
@@ -117,21 +125,28 @@ public class Game extends Canvas implements Runnable{
 		
 		//renderer.update();
 		
-		Matrix rotation = Matrix.yAxisRotationMatrix(1f * step);
-		Matrix rotation2 = Matrix.xAxisRotationMatrix(1f * step);
-		Matrix rotation3 = Matrix.zAxisRotationMatrix(1f * step);
-//		Matrix translation1 = Matrix.translationMatrix(0.5f, 0, -10.5f);
-//		Matrix translation2 = Matrix.translationMatrix(-0.5f, 0, 10.5f);
-		Matrix translation1 = Matrix.translationMatrix(0.0f, 0, -10.0f);
-		Matrix translation2 = Matrix.translationMatrix(-0.0f, 0, 10.0f);
-		Matrix transformation = translation1.multiply(rotation3).multiply(rotation2).multiply(rotation).multiply(translation2);
+//		Matrix rotation = Matrix.yAxisRotationMatrix(1f * step);
+//		Matrix rotation2 = Matrix.xAxisRotationMatrix(1f * step);
+//		Matrix rotation3 = Matrix.zAxisRotationMatrix(1f * step);
+////		Matrix translation1 = Matrix.translationMatrix(0.5f, 0, -10.5f);
+////		Matrix translation2 = Matrix.translationMatrix(-0.5f, 0, 10.5f);
+//		Matrix translation1 = Matrix.translationMatrix(0.0f, 0, -15.0f);
+//		Matrix translation2 = Matrix.translationMatrix(-0.0f, 0, 15.0f);
+//		Matrix transformation = translation1.multiply(rotation3).multiply(rotation2).multiply(rotation).multiply(translation2);
+//		
+//		for(Vertex v : renderer.getVertices()){
+//			
+//			Matrix newPos = transformation.multiply(v.getPos());
+//			v.setPos(newPos);
+//			
+//		}
 		
-		for(Vertex v : renderer.getVertices()){
-			
-			Matrix newPos = transformation.multiply(v.getPos());
-			v.setPos(newPos);
-			
-		}
+		
+		//rubiksCube.rotateCube(new EAngle(0.5f * step, 0.5f * step, 0.5f * step));
+		
+		//rubiksCube.applyTransformation(Matrix.translationMatrix(0, 0.3f * step, 0));
+		
+		rubiksCube.update();
 		
 	}
 	
@@ -164,8 +179,6 @@ public class Game extends Canvas implements Runnable{
 		Font newFont = currentFont.deriveFont(currentFont.getSize() * 3f);
 		g.setFont(newFont);
 		g.drawString((int) fps + " fps", 15, 40);
-		
-		//System.out.println(fps + "");
 		
 		renderer.getRaster().clear(0xfafafa);
 		
@@ -222,7 +235,7 @@ public class Game extends Canvas implements Runnable{
 		
 		
 		
-		Game game = new Game(800, 800, 1, 1f/60, "Pixels on a Screen");
+		Game game = new Game(800, 800, 1, 1f/60, "THIS IS AN ABSTRACTION");
 		game.start();
 		
 		
@@ -241,6 +254,31 @@ public class Game extends Canvas implements Runnable{
 //		System.out.println(v.rotateAround(Vector.BACK.scale(1), (float) Math.PI/2));
 		
 //		System.out.println(CubeGeometry.constructFaceVertices(Vector.ZERO, Vector.LEFT, 1, 0xff0000));
+		
+		
+		Vector a = new Vector(-1, -1, -20);
+		Vector b = new Vector(1, -1, -20);
+		Vector c = new Vector(1, 1, -20);
+		
+		Vector point = new Vector(0.5f, 0.1f, -1f);
+		
+		Ray ray = new Ray(Vector.ZERO, new  Vector(0, .3f, -1).normalize());
+		Plane plane = new Plane(Vector.UP, Vector.UP);
+		
+		//System.out.println(ray.xPlane(plane).getPos());
+		
+		//System.out.println(Raster.isInsideTriangle(a, b, c, point));
+		
+		System.out.println(ray.intersectsTriangle(a, b, c));
+		System.out.println(renderer.getSize());
+		System.out.println(renderer.getVertices().size());
+		
+		
+		
+		Vector p0 = new Vector(2, 0, 2);
+		Vector p1 = p0.rotateAround(Vector.UP, (float) Math.PI/2);
+		System.out.println(p1);
+		
 		
 	}
 	

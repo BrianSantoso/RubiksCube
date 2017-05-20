@@ -10,39 +10,63 @@ public class Mouse implements MouseListener, MouseMotionListener{
 	private int x;
 	private int y;
 	
-	private int startX;
-	private int startY;
+	boolean down;
+	boolean left, right;
 	
-	private int endX;
-	private int endY;
+	private int dragStartX;
+	private int dragStartY;
+	private int dragEndX;
+	private int dragEndY;
 	
+	private int prevX;
+	private int prevY;
 	private Vector direction;
+	
+	private Vector dragDirection;
 	
 	public Mouse(int width, int height){
 		
 		this.width = width;
 		this.height = height;
 		
+		down = false;
+		left = false;
+		right = false;
+		
 		this.x = 0;
 		this.y = 0;
-		this.startX = 0;
-		this.startY = 0;
-		this.endX = 0;
-		this.endY = 0;
+		this.dragStartX = 0;
+		this.dragStartY = 0;
+		this.dragEndX = 0;
+		this.dragEndY = 0;
+		this.prevX = 0;
+		this.prevY = 0;
 		
+		this.dragDirection = Vector.ZERO;
 		this.direction = Vector.ZERO;
+	}
+	
+	public Vector prevToVector(){
+		
+		return new Vector(prevX, prevY, 0);
 		
 	}
 	
-	public Vector startToVector(){
+	public Vector prevToVector(float z){
 		
-		return new Vector(startX, startY, 0);
+		return new Vector(prevX, prevY, z);
 		
 	}
 	
-	public Vector startToVector(float z){
+	public Vector dragStartToVector(){
 		
-		return new Vector(startX, startY, z);
+		return new Vector(dragStartX, dragStartY, 0);
+		
+	}
+	
+	public Vector dragStartToVector(float z){
+		
+		return new Vector(dragStartX, dragStartY, z);
 		
 	}
 	
@@ -58,15 +82,15 @@ public class Mouse implements MouseListener, MouseMotionListener{
 		
 	}
 	
-	public Vector endToVector(){
+	public Vector dragEndToVector(){
 		
-		return new Vector(endX, endY, 0);
+		return new Vector(dragEndX, dragEndY, 0);
 		
 	}
 	
-	public Vector endToVector(float z){
+	public Vector dragEndToVector(float z){
 		
-		return new Vector(endX, endY, z);
+		return new Vector(dragEndX, dragEndY, z);
 		
 	}
 	
@@ -107,8 +131,12 @@ public class Mouse implements MouseListener, MouseMotionListener{
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
-		startX = getX(e.getX());
-		startY = getY(e.getY());
+		down = true;
+		if(e.getButton() == 1) left = true;
+		if(e.getButton() == 3) right = true;
+		
+		dragStartX = getX(e.getX());
+		dragStartY = getY(e.getY());
 		
 	}
 
@@ -116,12 +144,18 @@ public class Mouse implements MouseListener, MouseMotionListener{
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
-		this.startX = 0;
-		this.startY = 0;
-		this.endX = 0;
-		this.endY = 0;
+		down = false;
+
+		if(e.getButton() == 1) left = false;
+		if(e.getButton() == 3) right = false;
 		
-		this.direction = Vector.ZERO;
+		
+		this.dragStartX = 0;
+		this.dragStartY = 0;
+		this.dragEndX = 0;
+		this.dragEndY = 0;
+		
+		this.dragDirection = Vector.ZERO;
 		
 	}
 
@@ -131,20 +165,47 @@ public class Mouse implements MouseListener, MouseMotionListener{
 	public void keyInputs() {
 		// TODO Auto-generated method stub
 		
+		
 	}
 
 	
-	
+	public Ray getRay(){
+		
+		Vector screenPoint = toVector(-1);
+		Vector point = new Vector(screenPoint.x() / width - 0.5f, screenPoint.y() / height - 0.5f, screenPoint.z());
+		
+		// Assume camera is oriented perfectly...
+		// Should take into account camera's orientation.
+		
+		Vector origin = Game.renderer.getCamera().getPos();
+		
+		Vector direction = point.minus(origin).normalize();
+		
+		//System.out.println("AAA: " + point);
+		
+		return new Ray(origin, direction);
+		
+	}
 	
 	
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		
-		endX = getX(e.getX());
-		endY = getY(e.getY());
+		prevX = x;
+		prevY = y;
 		
-		direction = endToVector(-1).minus(startToVector(0));
+		x = getX(e.getX());
+		y = getY(e.getY());
+		
+		dragEndX = getX(x);
+		dragEndY = getY(y);
+		
+		dragDirection = dragEndToVector(-1).minus(dragStartToVector(0));
+		
+		
+		
+		direction = toVector().minus(prevToVector());
 		
 		//System.out.println(direction);
 		
@@ -153,8 +214,16 @@ public class Mouse implements MouseListener, MouseMotionListener{
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		
+		prevX = x;
+		prevY = y;
+		
 		x = getX(e.getX());
 		y = getY(e.getY());
+		
+		direction = toVector(-1).minus(prevToVector());
+		
+		//System.out.println(direction);
+		
 	}
 	
 	public String toString(){
@@ -163,4 +232,39 @@ public class Mouse implements MouseListener, MouseMotionListener{
 		
 	}
 
+	public Vector getDragDirection() {
+		
+		return dragDirection;
+		
+	}
+	
+	public Vector getDirection(){
+		
+		return direction;
+		
+	}
+	
+	public void setDirection(Vector direction){
+		
+		this.direction = direction;
+		
+	}
+
+	public boolean down() {
+		
+		return down;
+		
+	}
+
+	public boolean left() {
+		
+		return left;
+	}
+
+	public boolean right(){
+		
+		return right;
+		
+	}
+	
 }

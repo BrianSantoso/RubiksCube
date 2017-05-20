@@ -54,5 +54,10 @@ public class Camera {
 		
 		
 	}
+
+	public Vector getPos() {
+		
+		return pos;
+	}
 	
 }

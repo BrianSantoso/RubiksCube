@@ -10,6 +10,15 @@ public class Matrix {
 		
 	}
 	
+	public static final Matrix IDENTITY = new Matrix(new float[][]{
+		
+		{1, 0, 0, 0},
+		{0, 1, 0, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 1}
+		
+	});
+	
 	public static Matrix xAxisRotationMatrix(float radians){
 		
 		float cos = (float) Math.cos(radians);
@@ -252,6 +261,30 @@ public class Matrix {
     	
     }
 	
+    public float x(){
+    	
+    	return this.m[0][1];
+    	
+    }
+    
+    public float y(){
+    	
+    	return this.m[1][0];
+    	
+    }
+    
+    public float z(){
+    	
+    	return this.m[2][0];
+    	
+    }
+    
+    public float w(){
+    	
+    	return this.m[3][0];
+    	
+    }
+    
 	public boolean equals(Object obj){
 		
 		Matrix mat = (Matrix) obj;

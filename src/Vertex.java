@@ -82,6 +82,12 @@ public class Vertex {
 		return "\n" + this.getPos() + "\n";
 		
 	}
+
+	public void setRGB(int rgb) {
+		
+		this.rgb = rgb;
+		
+	}
 	
 	
 

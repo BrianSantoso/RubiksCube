@@ -7,6 +7,7 @@ public class Renderer {
 	private ArrayList<Vertex> vertices;
 	private boolean wireFrame;
 	private boolean zBuffering;
+	private boolean interpolateColors;
 	
 	public Renderer(Camera camera, Raster raster){
 		
@@ -15,6 +16,7 @@ public class Renderer {
 		
 		wireFrame = false;
 		zBuffering = true;
+		interpolateColors = false;
 		
 		vertices = new ArrayList<Vertex>();
 		
@@ -208,7 +210,8 @@ public class Renderer {
 			// just replace with division... later
 			
 			Matrix homogonized = camera.getProjectionMatrix().multiply(vertex.getPos());
-			float p = 1 / homogonized.m()[3][0];
+			//float p = 1 / homogonized.m()[3][0];
+			float p = 1 / homogonized.w();
 			
 			Matrix projected = new Matrix(new float[][]{
 				
