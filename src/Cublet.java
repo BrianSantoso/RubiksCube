@@ -19,7 +19,15 @@ public class Cublet implements CubeComponent {
 			f.applyTransformation(transformation);
 		
 	}
-
+	
+	public void rotateData(Matrix transformation){
+		
+		//System.out.println(location);
+		this.location = transformation.multiply(location);
+		//System.out.println(location);
+		
+	}
+	
 	public void rotate(Vector pivot, Vector axis, float radians){
 		
 		for(Face f : faces)
@@ -36,6 +44,12 @@ public class Cublet implements CubeComponent {
 	public Matrix getLocation(){
 		
 		return location;
+		
+	}
+	
+	public boolean isOnSector(int[] sector){
+		
+		return (int) getLocation().m()[sector[0]][0] == sector[1];
 		
 	}
 	

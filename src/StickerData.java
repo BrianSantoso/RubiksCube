@@ -11,11 +11,11 @@ public class StickerData {
 	
 	private int faceSticker; // AKA color
 	
-	public StickerData(int face, int[] stickerCoordinates){
+	public StickerData(int face, int[] stickerCoordinates, ArrayList<int[]> sectors){
 		
 		axis = new int[]{ (face + 1) % 3, (face + 2) % 3 };	// The 2 parallel axis to this Sticker
 		
-		sectors = new ArrayList<int[]>();
+		this.sectors = sectors;
 		this.stickerCoordinates = stickerCoordinates;
 		this.face = face;
 		

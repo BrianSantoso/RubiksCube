@@ -19,6 +19,60 @@ public class Matrix {
 		
 	});
 	
+	public static final Matrix xAxisRotation90CC = new Matrix(new float[][]{
+		
+		{1,  0,  0,  0},
+		{0,  0, -1,  0},
+		{0,  1,  0,  0},
+		{0,  0,  0,  1}
+		
+	});
+	
+	public static final Matrix yAxisRotation90CC = new Matrix(new float[][]{
+			
+		{0,  0,  1,  0},
+		{0,  1,  0,  0},
+		{-1, 0,  0,  0},
+		{0,  0,  0,  1}
+		
+	});
+	
+	public static final Matrix zAxisRotation90CC = new Matrix(new float[][]{
+		
+		{0, -1,  0,  0},
+		{1,  0,  0,  0},
+		{0,  0,  1,  0},
+		{0,  0,  0,  1}
+		
+	});
+	
+	public static final Matrix xAxisRotation90C = new Matrix(new float[][]{
+		
+		{1,  0,  0,  0},
+		{0,  0,  1,  0},
+		{0, -1,  0,  0},
+		{0,  0,  0,  1}
+		
+	});
+	
+	public static final Matrix yAxisRotation90C = new Matrix(new float[][]{
+			
+		{0,  0, -1,  0},
+		{0,  1,  0,  0},
+		{1,  0,  0,  0},
+		{0,  0,  0,  1}
+		
+	});
+	
+	public static final Matrix zAxisRotation90C = new Matrix(new float[][]{
+		
+		{0,  1,  0,  0},
+		{-1,  0,  0,  0},
+		{0,  0,  1,  0},
+		{0,  0,  0,  1}
+		
+	});
+	
 	public static Matrix xAxisRotationMatrix(float radians){
 		
 		float cos = (float) Math.cos(radians);
@@ -263,7 +317,7 @@ public class Matrix {
 	
     public float x(){
     	
-    	return this.m[0][1];
+    	return this.m[0][0];
     	
     }
     

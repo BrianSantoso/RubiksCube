@@ -85,6 +85,7 @@ public class Game extends Canvas implements Runnable{
 		
 		//cc
 		rubiksCube = new RubiksCube(3, 1.4f);
+		//new RubiksCube(2, 2f);
 		
 	}
 	
@@ -146,7 +147,7 @@ public class Game extends Canvas implements Runnable{
 		
 		//rubiksCube.applyTransformation(Matrix.translationMatrix(0, 0.3f * step, 0));
 		
-		rubiksCube.update();
+		rubiksCube.update(step);
 		
 	}
 	

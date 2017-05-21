@@ -198,13 +198,12 @@ public class Mouse implements MouseListener, MouseMotionListener{
 		x = getX(e.getX());
 		y = getY(e.getY());
 		
-		dragEndX = getX(x);
-		dragEndY = getY(y);
+		dragEndX = x;
+		dragEndY = y;
 		
-		dragDirection = dragEndToVector(-1).minus(dragStartToVector(0));
+		dragDirection = dragEndToVector().minus(dragStartToVector());
 		
-		
-		
+		//System.out.println("DRAG DIR: " + dragDirection);
 		direction = toVector().minus(prevToVector());
 		
 		//System.out.println(direction);

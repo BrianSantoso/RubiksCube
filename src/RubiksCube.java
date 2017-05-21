@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
 
 public class RubiksCube implements CubeComponent{
 
@@ -13,8 +13,14 @@ public class RubiksCube implements CubeComponent{
 	private StickerManager stickerManager;
 	//private int[][] stickerNet;
 	
+	
+	
 	private int color;
-	private final int[] colorScheme;
+	private int[] colorScheme;
+	
+	private final Matrix[] turnCCMatrices;
+	
+	private LinkedList<Move> moves;
 	
 	private boolean turning;
 	
@@ -28,15 +34,7 @@ public class RubiksCube implements CubeComponent{
 		//pos = new Vector(0, 0, -15 -(float)(n - 1)/2);
 		
 		pos = new Vector(0, 0, -12.7729f - z);
-		
 		axis = new Vector[]{ Vector.RIGHT, Vector.UP, Vector.BACK }; // might replace forward with backwards and vice versa
-		
-		// 6n^2 - 12n + 8
-		
-		
-		//stickerNet = new int[dimensions[1] * 2 + dimensions[0] * 2][dimensions[2] + dimensions[1] * 2];
-		
-		//color = 0x333333;
 		
 		color = 0x080808;
 		colorScheme = new int[]{
@@ -64,18 +62,30 @@ public class RubiksCube implements CubeComponent{
 		
 		stickerManager = new StickerManager(this.n);
 		
+		// 6n^2 - 12n + 8
 		int len = this.n == 1 ? 1 : 6 * this.n * this.n - 12 * this.n + 8;
 		pieces = new Cublet[len];
 		constructPieces();
 		
 		//rotateCube(new EAngle(0.01f, 0.01f, 0));
 		
+		moves = new LinkedList<Move>();
 		
-		//rotateCube(new EAngle(0.5f, 0.5f, 0));
-		//rotateCube(new EAngle((float) Math.PI/4, (float) Math.PI/4, 0));
-		//rotateCube(new EAngle((float) Math.PI/4, 0, 0));
-		//rotateCube(new EAngle((float) Math.PI/4, (float) Math.PI/4, 0));
-		//rotateCube(new EAngle((float) Math.PI/4, (float) Math.PI/4, 0));
+		float t = (float) (n - 1) / 2;
+		turnCCMatrices = new Matrix[]{ 
+				
+				Matrix.translationMatrix(0, t, t).multiply(Matrix.xAxisRotation90CC).multiply(Matrix.translationMatrix(0, -t, -t)),
+				Matrix.translationMatrix(t, 0, t).multiply(Matrix.yAxisRotation90CC).multiply(Matrix.translationMatrix(-t, 0, -t)),
+				Matrix.translationMatrix(t, t, 0).multiply(Matrix.zAxisRotation90CC).multiply(Matrix.translationMatrix(-t, -t, 0)),
+				
+				Matrix.translationMatrix(0, t, t).multiply(Matrix.xAxisRotation90C).multiply(Matrix.translationMatrix(0, -t, -t)),
+				Matrix.translationMatrix(t, 0, t).multiply(Matrix.yAxisRotation90C).multiply(Matrix.translationMatrix(-t, 0, -t)),
+				Matrix.translationMatrix(t, t, 0).multiply(Matrix.zAxisRotation90C).multiply(Matrix.translationMatrix(-t, -t, 0)),
+				
+		};
+		
+		
+		rotateCube(new EAngle((float) Math.PI/4, (float) Math.PI/4, 0));
 		
 		//moveCube(new Vector(-3f, 0, 0));
 		
@@ -97,7 +107,37 @@ public class RubiksCube implements CubeComponent{
 //		
 //		applyTransformation(transformation0);
 		
-		System.out.println(getAxisIndices(1, 1, 0));
+		System.out.println(stickerManager.isSolved());
+		
+//		makeMove(new int[]{0, 2}, true);
+//		makeMove(new int[]{1, 2}, true);
+//		makeMove(new int[]{0, 2}, false);
+//		makeMove(new int[]{1, 2}, false);
+	
+		System.out.println(stickerManager.isSolved());
+		//highlight(new int[]{1, 2});
+		
+	}
+	
+	public void highlight(int[] sector){
+		
+		for(Cublet c : pieces){
+			
+			if(c.isOnSector(sector)){
+				
+				System.out.println(c.getLocation());
+				
+				for(Face f : c.getFaces()){
+					
+					Game.renderer.getVertex(f.getVertexIndexArray()[0]).setRGB(0xabcdef);
+					//Game.renderer.getVertex(f.getVertexIndexArray()[3]).setRGB(0xabcdef);
+					
+				}
+				
+			}
+			
+		}
+		
 	}
 	
 	public void constructPieces(){
@@ -127,13 +167,18 @@ public class RubiksCube implements CubeComponent{
 						
 						for(int face = 0; face < 6; face++){
 							
+							Face f = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[face], size/2, size, color));
+							facesToAdd.add(f);
+							
 							if(isOnFace(face, x, y, z)){
 								
 								int[] stickerCoordinates = stickerManager.getStickerCoordinates(face, x, y, z);
 								//if(rep == 2) System.out.println(stickerCoordinates[0] + " , " + stickerCoordinates[1]);
 								//System.out.println(stickerCoordinates[0] + " , " + stickerCoordinates[1]);
-								Sticker s = new Sticker(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[face], size/2 + 0.08f, size * 0.8f, colorScheme[face]), stickerCoordinates, face);
+								Sticker s = new Sticker(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[face], size/2 + 0.03f, size * 0.8f, colorScheme[face]), stickerCoordinates, face);
 								facesToAdd.add(s);
+								
+								
 								
 //								Face f0 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[0], size/2, size, color));
 //								Face f1 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[1], size/2, size, color));
@@ -158,21 +203,21 @@ public class RubiksCube implements CubeComponent{
 							
 						}
 						
-						Face f0 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[0], size/2, size, color));
-						Face f1 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[1], size/2, size, color));
-						Face f2 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[2], size/2, size, color));
-						Face f3 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[3], size/2, size, color));
-						Face f4 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[4], size/2, size, color));
-						Face f5 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[5], size/2, size, color));
+//						Face f0 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[0], size/2, size, color));
+//						Face f1 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[1], size/2, size, color));
+//						Face f2 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[2], size/2, size, color));
+//						Face f3 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[3], size/2, size, color));
+//						Face f4 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[4], size/2, size, color));
+//						Face f5 = new Face(CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[5], size/2, size, color));
 						
 						//System.out.println("s " + CubeGeometry.constructFaceVertices(pos, EAngle.AXIS_ANGLES[rep], size/2 + 0.01f, size * 0.8f, colorScheme[rep]));
 						
-						facesToAdd.add(f0);
-						facesToAdd.add(f1);
-						facesToAdd.add(f2);
-						facesToAdd.add(f3);
-						facesToAdd.add(f4);
-						facesToAdd.add(f5);
+//						facesToAdd.add(f0);
+//						facesToAdd.add(f1);
+//						facesToAdd.add(f2);
+//						facesToAdd.add(f3);
+//						facesToAdd.add(f4);
+//						facesToAdd.add(f5);
 						
 						//temp += 6 * 6;
 						
@@ -226,30 +271,30 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
-	public ArrayList<Integer> getAxisIndices(int x, int y, int z){
-		
-//		int[] axisIndices = new int[3];
-//
-//		for(int rep = 0, index = 0; rep < 6 && index < 3; rep++){
-//			
-//			if(isOnFace(rep, x, y, z)){
-//				axisIndices[index] = rep;
-//				index++;
-//			}
-//			
-//		}
+//	public ArrayList<Integer> getAxisIndices(int x, int y, int z){
+//		
+////		int[] axisIndices = new int[3];
+////
+////		for(int rep = 0, index = 0; rep < 6 && index < 3; rep++){
+////			
+////			if(isOnFace(rep, x, y, z)){
+////				axisIndices[index] = rep;
+////				index++;
+////			}
+////			
+////		}
+////		
+////		return axisIndices;
+//		
+//		ArrayList<Integer> axisIndices = new ArrayList<Integer>();
+//		
+//		for(int rep = 0; rep < 6; rep++)	
+//			if(isOnFace(rep, x, y ,z))
+//				axisIndices.add(rep);
 //		
 //		return axisIndices;
-		
-		ArrayList<Integer> axisIndices = new ArrayList<Integer>();
-		
-		for(int rep = 0; rep < 6; rep++)	
-			if(isOnFace(rep, x, y ,z))
-				axisIndices.add(rep);
-		
-		return axisIndices;
-		
-	}
+//		
+//	}
 	
 	public boolean isOnOutside(int x, int y, int z){
 		
@@ -259,21 +304,35 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
-	public void turnFace(int face, boolean clockwise){
+	public void makeMove(int[] sector, boolean cc){
+		
+		rotateSectorData(sector, cc);
+		
+		stickerManager.rotateStickerData(sector, cc);
+		
+		rotateFace(sector, axis[sector[0]], (float) Math.PI/2 * (cc ? -1 : 1));
+		
+	}
+	
+	public void rotateSectorData(int[] sector, boolean cc){
+		
+		Matrix transformation = turnCCMatrices[sector[0] + (cc ? 0 : 3)];
+		//System.out.println("Transformation \n" + transformation);
 		
 		for(Cublet c : pieces){
 			
-			ArrayList<Integer> axisIndices = getAxisIndices((int) c.getLocation().x(), (int) c.getLocation().y(), (int) c.getLocation().z());
-			
-			if(axisIndices.contains(face)){
+			if(c.isOnSector(sector)){
 				
-				
+				System.out.println("before");
+				System.out.println(c.getLocation());
+				c.rotateData(transformation);
+				System.out.println(c.getLocation());
 				
 			}
 			
 		}
 		
-		//turn face turns the data, not the model
+		//turns the data, not the model
 		
 	}
 	
@@ -397,6 +456,7 @@ public class RubiksCube implements CubeComponent{
 		//applyTransformation(Matrix.translationMatrix(-0.000001f, 0, 0));
 		
 		Vector direction = mouse.getDirection();
+		//System.out.println(direction);
 		
 		float rotationSensitivity = 0.02f;		
 		float translationSensitivity = 0.05f;
@@ -436,7 +496,7 @@ public class RubiksCube implements CubeComponent{
 				
 				//System.out.println(ray);
 				
-				System.out.println(Game.renderer.getVertex(via[0]).getRGB() + " coords:  " + sticker.getStickerCoordinates()[0] + " , " + sticker.getStickerCoordinates()[1]);
+				//System.out.println(Game.renderer.getVertex(via[0]).getRGB() + " coords:  " + sticker.getStickerCoordinates()[0] + " , " + sticker.getStickerCoordinates()[1]);
 			
 				//for(int x : via) System.out.print(x + " "); System.out.println();
 				//for(int x : via) Game.renderer.getVertex(x).setRGB(0xabcdef);
@@ -445,12 +505,52 @@ public class RubiksCube implements CubeComponent{
 //				StickerData sd = stickerManager.getNet()[c[0]][c[1]];
 				
 				StickerData sd = stickerManager.getStickerData(sticker);
-				System.out.println("hi: " + sd.getAxis()[0] + " , " + sd.getAxis()[1]);
+				System.out.println("axis: " + sd.getAxis()[0] + " , " + sd.getAxis()[1]);
+				
+				ArrayList<int[]> sectors = sd.getSectors();
+				System.out.println("sector: ");
+				for(int[] sector : sectors){
+					
+					for(int x : sector) System.out.print(x + " ");
+					System.out.println();
+					
+				}
+				
+				Vector dragDirection = mouse.getDragDirection();
+				
+				
+				System.out.println("dragDirection: " + dragDirection);
+				
+				
+				float minDistance = 30;
+				
+				if(dragDirection.getMagnitudeSquared() > minDistance * minDistance){
+				
+					System.out.println("YEEET");
+					Vector normalizedDirection = dragDirection.normalize();
+					System.out.println("normalized: " + normalizedDirection);
+					
+					int whichAxisIndex = whichAxis(normalizedDirection, sd.getAxis());
+					Vector rotationAxis = axis[whichAxisIndex];
+					
+					System.out.println("WHICH AXIS INDEX: " + whichAxisIndex);
+					int[] sector = sd.getSectors().get(whichAxisIndex);
+					
+					if(direction.getMagnitudeSquared() > 1 * 1){
+					
+						float dot = direction.normalize().dot(rotationAxis);
+						float cc = -dot / Math.abs(dot);
+						
+						makeMove(sector, cc > 0);
+						//rotateFace(sector, rotationAxis, (float) direction.getMagnitude() * rotationSensitivity * cc);
+						
+					}
+					
+				}
+				
+				
 				
 				// sector, axis, radians
-				System.out.println("test: " + sd.getAxis()[0]);
-				int[] ai = sd.getAxis();
-				for(int x : ai) System.out.print(ai + " "); System.out.println();
 				//rotateFace(sd.getSectors().get(0), axis[sd.getAxis()[0]], 0.1f);
 				
 				
@@ -465,8 +565,21 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
-	public void update(){
+	public int whichAxis(Vector normalizedMouseDirection, int[] axisIndices){
 		
+		
+		
+		Vector axis1 = axis[axisIndices[0]];
+		Vector axis2 = axis[axisIndices[1]];
+		
+		//Vector projectedAxis1 = axis.project();
+		return Math.abs(normalizedMouseDirection.dot(axis1)) < Math.abs(normalizedMouseDirection.dot(axis2)) ? axisIndices[0] : axisIndices[1];
+		
+	}
+	
+	public void update(float step){
+		
+		//destroy(0.1f);
 		//rotateFace(new EAngle(0, 0.01f, 0), new int[]{1, 0});
 		
 	}
