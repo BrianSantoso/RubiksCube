@@ -14,8 +14,7 @@ public class RubiksCube implements CubeComponent{
 	//private int[][] stickerNet;
 	
 	
-	
-	private int color;
+	private int[][] colorSchemes;
 	private int[] colorScheme;
 	
 	//private final Matrix[] turnCCMatrices;
@@ -36,17 +35,36 @@ public class RubiksCube implements CubeComponent{
 		pos = new Vector(0, 0, -12.7729f - z);
 		axis = new Vector[]{ Vector.RIGHT, Vector.UP, Vector.BACK }; // might replace forward with backwards and vice versa
 		
-		color = 0x080808;
-		colorScheme = new int[]{
-				
-				0xff6600, // 0: Orange. Right Face.
-				0xffffff, // 1: White. Up Face.
-				0x1e90ff, // 2: Blue. Front Face.
-				0xfe0000, // 3: Red. Left Face.
-				0xffff00, // 4: Yellow. Down Face.
-				0x00ff00, // 5: Green. Back Face.
-				
+		
+		colorSchemes = new int[][]{
+			
+			new int[]{
+					
+					0xffffff,
+					0xffffff,
+					0xffffff,
+					0xffffff,
+					0xffffff,
+					0xffffff,
+					0x000000
+					
+			},
+			
+			new int[]{
+					
+					0xff6600, // 0: Orange. Right Face.
+					0xffffff, // 1: White. Up Face.
+					0x1e90ff, // 2: Blue. Front Face.
+					0xfe0000, // 3: Red. Left Face.
+					0xffff00, // 4: Yellow. Down Face.
+					0x00ff00, // 5: Green. Back Face.
+					0x080808  // 6: Cube's background color
+					
+			}
+			
 		};
+		
+		colorScheme = colorSchemes[1];
 		
 //		color = 0xffffff;
 //		colorScheme = new int[]{
@@ -180,7 +198,7 @@ public class RubiksCube implements CubeComponent{
 							
 							
 							
-							Face f = new Face(Face.constructFaceVertices(pos, EAngle.AXIS_ANGLES[face], size/2, size, color));
+							Face f = new Face(Face.constructFaceVertices(pos, EAngle.AXIS_ANGLES[face], size/2, size, colorScheme[6]));
 							facesToAdd.add(f);
 							
 							if(isOnFace(face, x, y, z)){
@@ -190,7 +208,7 @@ public class RubiksCube implements CubeComponent{
 								int[] stickerCoordinates = stickerManager.getStickerCoordinates(face, x, y, z);
 								//if(rep == 2) System.out.println(stickerCoordinates[0] + " , " + stickerCoordinates[1]);
 								//System.out.println(stickerCoordinates[0] + " , " + stickerCoordinates[1]);
-								Sticker s = new Sticker(Face.constructFaceVertices(pos, EAngle.AXIS_ANGLES[face], size/2 + 0.03f, size * 0.8f, colorScheme[face]), stickerCoordinates, face, location);
+								Sticker s = new Sticker(Face.constructFaceVertices(pos, EAngle.AXIS_ANGLES[face], size/2 + 0.07f, size * 0.8f, colorScheme[face]), stickerCoordinates, face, location);
 								
 								//System.out.println(s);
 								//if(face == 0 && x == 2 && z == 2 && y == 0) System.out.println("hi");
@@ -427,6 +445,22 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
+	@Override
+	public void setColor(int[] colorScheme){
+		
+		this.colorScheme = colorScheme;
+		
+		for(Cublet c : pieces)
+			c.setColor(colorScheme);
+		
+	}
+	
+	public void setColor(int colorSchemeIndex){
+		
+		setColor(colorScheme[colorSchemeIndex]);
+		
+	}
+	
 //	public void applyTransformation(Matrix transformation, int[] sector) {
 //		
 //		this.pos = transformation.multiply(pos.toMatrix()).toVector();
@@ -603,10 +637,13 @@ public class RubiksCube implements CubeComponent{
 	}
 	
 	public void update(float step){
+		
 		//destroy(0.2f);
 		//destroy(0.1f);
 		//rotateFace(new EAngle(0, 0.01f, 0), new int[]{1, 0});
 		
 	}
+	
+	
 	
 }

@@ -106,5 +106,17 @@ public class Face implements CubeComponent {
 		}
 		
 	}
+
+	@Override
+	public void setColor(int[] colorScheme) {
+		
+		for(int i = 0; i < vertexIndexArray.length; i++){
+			
+			Vertex v = Game.renderer.getVertex(vertexIndexArray[i]);
+			v.setRGB(colorScheme[6]);
+			
+		}
+		
+	}
 	
 }

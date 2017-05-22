@@ -66,6 +66,16 @@ public class Sticker extends Face {
 		this.location = location;
 	}
 
-	
+	@Override
+	public void setColor(int[] colorScheme){
+		
+		for(int i = 0; i < getVertexIndexArray().length; i++){
+			
+			Vertex v = Game.renderer.getVertex(getVertexIndexArray()[i]);
+			v.setRGB(colorScheme[face]);
+			
+		}
+		
+	}
 	
 }

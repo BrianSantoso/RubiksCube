@@ -20,6 +20,14 @@ public class Cublet implements CubeComponent {
 		
 	}
 	
+	@Override
+	public void setColor(int[] colorScheme){
+		
+		for(Face f : faces)
+			f.setColor(colorScheme);
+		
+	}
+	
 	public void rotateData(Matrix transformation){
 		
 		//System.out.println(location);
