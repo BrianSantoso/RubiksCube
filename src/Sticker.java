@@ -5,12 +5,14 @@ public class Sticker extends Face {
 	//private int[] stickerNetLocation;
 	private int face; // its a number
 	private int[] stickerCoordinates;
-
-	public Sticker(ArrayList<Vertex> vertices, int[] stickerCoordinates, int face){
+	private Matrix location;
+	
+	public Sticker(ArrayList<Vertex> vertices, int[] stickerCoordinates, int face, Matrix location){
 		
 		super(vertices);
 		this.stickerCoordinates = stickerCoordinates;
 		this.face = face;
+		this.location = location;
 		
 	}
 	
@@ -56,5 +58,14 @@ public class Sticker extends Face {
 		this.face = face;
 	}
 
+	public Matrix getLocation() {
+		return location;
+	}
+
+	public void setLocation(Matrix location) {
+		this.location = location;
+	}
+
+	
 	
 }

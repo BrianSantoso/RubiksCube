@@ -5,9 +5,9 @@ public class Cublet implements CubeComponent {
 	private ArrayList<Face> faces;
 	private Matrix location;
 	
-	public Cublet(Vector location, ArrayList<Face> faces){
+	public Cublet(Matrix location, ArrayList<Face> faces){
 		
-		this.location = location.toMatrix();
+		this.location = location;
 		this.faces = faces;
 		
 	}

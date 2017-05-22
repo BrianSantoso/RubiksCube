@@ -9,7 +9,7 @@ public class StickerData {
 	private final int[] stickerCoordinates;
 	private final int face;
 	
-	private int faceSticker; // AKA color
+	//private int faceSticker; // AKA color
 	
 	public StickerData(int face, int[] stickerCoordinates, ArrayList<int[]> sectors){
 		
@@ -22,13 +22,13 @@ public class StickerData {
 		
 	}
 
-	public int getFaceSticker() {
-		return faceSticker;
-	}
-
-	public void setFaceSticker(int faceSticker) {
-		this.faceSticker = faceSticker;
-	}
+//	public int getFaceSticker() {
+//		return faceSticker;
+//	}
+//
+//	public void setFaceSticker(int faceSticker) {
+//		this.faceSticker = faceSticker;
+//	}
 
 	public int[] getAxis() {
 		return axis;
