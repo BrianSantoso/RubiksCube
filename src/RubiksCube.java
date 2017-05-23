@@ -21,13 +21,19 @@ public class RubiksCube implements CubeComponent{
 	
 	private LinkedList<Move> moves;
 	
+	private ArrayList<AnimationData> animationQueue;
+	
 	private Sticker selectedSticker;
 	private StickerData selectedStickerData;
 	private boolean dragging;
 	private boolean lockDirection;
 	private float minDragDistance1;
-	private float minDragDistance2;
+	private float minRadians;
 	private int lockedRotationAxisIndex;
+	private float accumulatedRadians;
+	
+	private int animationFrames;
+	private float accumulationTime;
 	
 	private float rotationSensitivity;
 	private float translationSensitivity;
@@ -161,9 +167,17 @@ public class RubiksCube implements CubeComponent{
 		selectedStickerData = null;
 		dragging = false;
 		lockedRotationAxisIndex = -100;
-		minDragDistance1 = 10;
-		minDragDistance2 = 40;
+		accumulatedRadians = 0;
 		
+		animationFrames = 10;
+		minDragDistance1 = 10;
+		minRadians = (float) Math.PI / 6;
+		
+		animationQueue = new ArrayList<AnimationData>();
+		accumulationTime = 0;
+		
+		
+		//makeMove(new int[]{0, 2}, true);
 	}
 	
 	public void highlight(int[] sector){
@@ -371,10 +385,13 @@ public class RubiksCube implements CubeComponent{
 		rotateSectorData(sector, cc);
 		
 		stickerManager.rotateStickerData(sector, cc);
+
+		System.out.println("MOVE MADE");
 		
-		rotateFace(sector, axis[sector[0]], (float) Math.PI/2 * (cc ? -1 : 1));
+		//if(!animated) rotateFace(sector, axis[sector[0]], (float) Math.PI/2 * (cc ? -1 : 1));
 		
 	}
+	
 	
 	public void rotateSectorData(int[] sector, boolean cc){
 		
@@ -541,6 +558,7 @@ public class RubiksCube implements CubeComponent{
 		selectedStickerData = null;
 		dragging = false;
 		lockedRotationAxisIndex = -100;
+		accumulatedRadians = 0;
 		
 	}
 	
@@ -563,6 +581,24 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
+	public void interpolateFace(int[] sector, Vector axis, float radians){
+		
+		float radiansPerAnimation = radians / animationFrames;
+		
+		for(int rep = 0; rep < animationFrames; rep++){
+			
+			animationQueue.add(0, new AnimationData(sector, axis, radiansPerAnimation));
+			
+		}
+		
+	}
+	
+	public boolean isAnimating(){
+		
+		return animationQueue.size() > 0;
+		
+	}
+	
 	public void keyInputs(Mouse mouse){
 		
 		Vector direction = mouse.getDirection();
@@ -571,75 +607,104 @@ public class RubiksCube implements CubeComponent{
 		Vector dragDirection = mouse.getDragDirection();
 		Vector normalizedDragDirection = dragDirection.normalize();
 		
-		if(mouse.left()){
+		if(!isAnimating()){
 			
-			rotateCube(new EAngle(-direction.y() * rotationSensitivity, direction.x() * rotationSensitivity, 0));
-			
-		}
-		
-		if(mouse.right()){
-			
-			if(stickerSelected()){
+			// put this part under !isAnimating() because the interpolated animation rotates 
+			// around a given Vector axis and the axis will change as the cube rotates
+			// so instead i should be using the axis index ?
+			if(mouse.left()){
 				
-				if(rotationAxisLocked()){
+				rotateCube(new EAngle(-direction.y() * rotationSensitivity, direction.x() * rotationSensitivity, 0));
+				
+			}
+		
+		
+			
+			if(mouse.right()){
+				
+				if(stickerSelected()){
 					
-					int[] sector = selectedStickerData.getSectors().get(lockedRotationAxisIndex % 3);
-					
-					Vector rotationAxis = axis[lockedRotationAxisIndex];
-					
-//					//do not need to normalize dot product because we just want the sign
-//					float dot = direction.dot(rotationAxis);
-//					System.out.println("dot: " + dot);
-					//float cc = dot > 0 ? 1 : -1;	// Positive or Negative means CC or C
-					
-					float cross = direction.cross(rotationAxis).z();
-					float cc = cross > 0 ? 1 : -1;
-					System.out.println("cross: " + cross);
-					
-					float radians = direction.getMagnitude() * rotationSensitivity * cc;
-					
-					rotateFace(sector, rotationAxis, radians);
-					
+					if(rotationAxisLocked()){
+						
+						int[] sector = selectedStickerData.getSectors().get(lockedRotationAxisIndex % 3);
+						
+						Vector rotationAxis = axis[lockedRotationAxisIndex];
+						
+						float cross = direction.cross(rotationAxis).z();
+						float cc = cross > 0 ? 1 : -1;
+	//					System.out.println("cross: " + cross);
+						
+						float radians = direction.getMagnitude() * rotationSensitivity * cc;
+						accumulatedRadians += radians;
+						
+						System.out.println(accumulatedRadians);
+						
+						rotateFace(sector, rotationAxis, radians);
+						
+						if(Math.abs(accumulatedRadians) > minRadians){
+							
+							// counter clockwise is defined reversely for axis 3, 4, and 5, so flip the rotation direction if it is 3 4 or 5
+							makeMove(sector, (lockedRotationAxisIndex > 2) ^ (dragDirection.cross(rotationAxis).z() < 0));
+							
+							interpolateFace(sector, rotationAxis, cc * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
+							
+							
+							System.out.println("accumulatedRadians " + accumulatedRadians);
+							resetSelectionData();
+						}
+						
+						
+					} else {
+						
+						if(dragDirection.getMagnitudeSquared() >= minDragDistance1 * minDragDistance1){
+							
+							int[] axisIndices = selectedStickerData.getAxis();
+							
+							System.out.println(axisIndices[0] + " , " + axisIndices[1]);
+							
+							// THESE DOT PRODUCTS ARE NORMALIZED FOR THE SAKE OF COMPARISON
+							float dot1 = axis[axisIndices[0]].dot(normalizedDragDirection);
+							float dot2 = axis[axisIndices[1]].dot(normalizedDragDirection);
+							
+							int whichAxisToLock = Math.abs(dot1) < Math.abs(dot2) ? axisIndices[0] : axisIndices[1];
+							
+							System.out.println("locked axis index: " + whichAxisToLock);
+							//DONT DO THIS: lock rotation around general axis. use dot product to determine which direction		
+							lockRotationAxisIndex(whichAxisToLock);
+							
+							
+						}
+						
+					}
 					
 				} else {
 					
-					if(dragDirection.getMagnitudeSquared() >= minDragDistance1 * minDragDistance1){
-						
-						int[] axisIndices = selectedStickerData.getAxis();
-						
-						System.out.println(axisIndices[0] + " , " + axisIndices[1]);
-						
-						// THESE DOT PRODUCTS ARE NORMALIZED FOR THE SAKE OF COMPARISON
-						float dot1 = axis[axisIndices[0]].dot(normalizedDragDirection);
-						float dot2 = axis[axisIndices[1]].dot(normalizedDragDirection);
-						
-						int whichAxisToLock = Math.abs(dot1) < Math.abs(dot2) ? axisIndices[0] : axisIndices[1];
-						
-						System.out.println("locked axis index: " + whichAxisToLock);
-						//DONT DO THIS: lock rotation around general axis. use dot product to determine which direction		
-						lockRotationAxisIndex(whichAxisToLock);
-						
-						
-					}
+					Ray ray = mouse.getRay();
+					Sticker requestedStickerSelection = whichSticker(ray);
+					
+					if(requestedStickerSelection != null)
+						selectSticker(requestedStickerSelection);
 					
 				}
 				
 			} else {
 				
-				Ray ray = mouse.getRay();
-				Sticker requestedStickerSelection = whichSticker(ray);
+				if(Math.abs(accumulatedRadians) > 0 && selectedStickerData != null){
+					
+					int[] sector = selectedStickerData.getSectors().get(lockedRotationAxisIndex % 3);
+					Vector rotationAxis = axis[lockedRotationAxisIndex];
+					
+					interpolateFace(sector, rotationAxis, -accumulatedRadians);
+					
+				}
 				
-				if(requestedStickerSelection != null)
-					selectSticker(requestedStickerSelection);
+				
+				
+				
+				resetSelectionData();
 				
 			}
-			
-		} else {
-			
-			resetSelectionData();
-			
 		}
-		
 		
 	}
 	
@@ -866,6 +931,17 @@ public class RubiksCube implements CubeComponent{
 	}
 	
 	public void update(float step){
+		
+		if(animationQueue.size() > 0){
+			
+			AnimationData a = animationQueue.get(0);
+			
+			//should store axis index huh?
+			rotateFace(a.getSector(), a.getAxis(), a.getRadians());
+			
+			animationQueue.remove(0);
+			
+		}
 		
 		//destroy(0.2f);
 		//destroy(0.1f);
