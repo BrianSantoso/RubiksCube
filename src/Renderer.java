@@ -147,7 +147,7 @@ public class Renderer {
 					
 					// I thought this was right
 					
-					depth = 1f / Raster.barycentricInterpolation(
+					depth = 1f / Raster.barycentricInterpolation2(
 						a, 1f / v0.getZ(),
 						b, 1f / v1.getZ(),
 						c, 1f / v2.getZ(),

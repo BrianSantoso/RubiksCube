@@ -2,13 +2,13 @@
 public class AnimationData {
 
 	private int[] sector;
-	private Vector axis;
+	private int axisIndex;
 	private float radians;
 	
-	public AnimationData(int[] sector, Vector axis, float radians){
+	public AnimationData(int[] sector, int axisIndex, float radians){
 		
 		this.sector = sector;
-		this.axis = axis;
+		this.axisIndex = axisIndex;
 		this.radians = radians;
 		
 	}
@@ -21,12 +21,12 @@ public class AnimationData {
 		this.sector = sector;
 	}
 
-	public Vector getAxis() {
-		return axis;
+	public int getAxisIndex() {
+		return axisIndex;
 	}
 
-	public void setAxis(Vector axis) {
-		this.axis = axis;
+	public void setAxisIndex(int axisIndex) {
+		this.axisIndex = axisIndex;
 	}
 
 	public float getRadians() {

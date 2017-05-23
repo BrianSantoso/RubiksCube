@@ -84,7 +84,7 @@ public class Game extends Canvas implements Runnable{
 		addMouseListener(mouse);
 		
 		//cc
-		rubiksCube = new RubiksCube(3, 1f);
+		rubiksCube = new RubiksCube(4, 1f);
 		//new RubiksCube(3, 1.4f);
 		
 	}

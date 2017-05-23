@@ -122,6 +122,12 @@ public class Vector {
 		
 	}
 	
+	public float cross2(Vector a){
+		
+		return this.x * a.y - this.y * a.x;
+		
+	}
+	
 	/**
 	 * Normalizes a Vector
 	 * 

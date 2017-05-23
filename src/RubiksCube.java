@@ -468,6 +468,14 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
+	public void rotateFace(int[] sector, int axisIndex, float radians){
+		
+		Vector rotationAxis = axis[axisIndex];
+		
+		rotateFace(sector, rotationAxis, radians);
+		
+	}
+	
 	@Override
 	public void applyTransformation(Matrix transformation) {
 		
@@ -581,13 +589,13 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
-	public void interpolateFace(int[] sector, Vector axis, float radians){
+	public void interpolateFace(int[] sector, int axisIndex, float radians){
 		
 		float radiansPerAnimation = radians / animationFrames;
 		
 		for(int rep = 0; rep < animationFrames; rep++){
 			
-			animationQueue.add(0, new AnimationData(sector, axis, radiansPerAnimation));
+			animationQueue.add(0, new AnimationData(sector, axisIndex, radiansPerAnimation));
 			
 		}
 		
@@ -648,7 +656,8 @@ public class RubiksCube implements CubeComponent{
 							//makeMove(sector, (lockedRotationAxisIndex > 2) ^ (dragDirection.cross(rotationAxis).z() < 0));
 							
 							makeMove(sector, (lockedRotationAxisIndex > 2) ^ (cc < 0));
-							interpolateFace(sector, rotationAxis, cc * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
+							interpolateFace(sector, lockedRotationAxisIndex, cc * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
+							//interpolateFace(sector, rotationAxis, cc * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
 							
 							
 							System.out.println("accumulatedRadians " + accumulatedRadians);
@@ -696,7 +705,8 @@ public class RubiksCube implements CubeComponent{
 					int[] sector = selectedStickerData.getSectors().get(lockedRotationAxisIndex % 3);
 					Vector rotationAxis = axis[lockedRotationAxisIndex];
 					
-					interpolateFace(sector, rotationAxis, -accumulatedRadians);
+					interpolateFace(sector, lockedRotationAxisIndex, -accumulatedRadians);
+					//interpolateFace(sector, rotationAxis, -accumulatedRadians);
 					
 				}
 				
@@ -934,12 +944,15 @@ public class RubiksCube implements CubeComponent{
 	
 	public void update(float step){
 		
+		//rotateCube(new EAngle(1f * step, 0, 0));
+		
 		if(animationQueue.size() > 0){
 			
 			AnimationData a = animationQueue.get(0);
 			
 			//should store axis index huh?
-			rotateFace(a.getSector(), a.getAxis(), a.getRadians());
+			rotateFace(a.getSector(), a.getAxisIndex(), a.getRadians());
+			//rotateFace(a.getSector(), a.getAxis(), a.getRadians());
 			
 			animationQueue.remove(0);
 			

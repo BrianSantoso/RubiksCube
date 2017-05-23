@@ -116,9 +116,36 @@ public class Raster {
 		
 	}
 	
+	public static float[] barycentricWeights2(Vector a, Vector b, Vector c, Vector point){
+		
+		float totalArea = areaOfTriangle2(a, b, c);
+		float areaOfTriangleA = areaOfTriangle2(point, b, c);
+		float areaOfTriangleB = areaOfTriangle2(point, c, a);
+		float areaOfTriangleC = totalArea - areaOfTriangleA - areaOfTriangleB;
+		
+		//System.out.println(areaOfTriangleA + areaOfTriangleB + areaOfTriangleC == totalArea);
+		
+		return new float[]{
+				
+				areaOfTriangleA / totalArea,
+				areaOfTriangleB / totalArea,
+				areaOfTriangleC / totalArea
+				
+		};
+		
+	}
+	
 	public static float barycentricInterpolation(Vector a, float aValue, Vector b, float bValue, Vector c, float cValue, Vector point){
 		
 		float[] weights = barycentricWeights(a, b, c, point);
+		
+		return aValue * weights[0] + bValue * weights[1] + cValue * weights[2];
+		
+	}
+	
+	public static float barycentricInterpolation2(Vector a, float aValue, Vector b, float bValue, Vector c, float cValue, Vector point){
+		
+		float[] weights = barycentricWeights2(a, b, c, point);
 		
 		return aValue * weights[0] + bValue * weights[1] + cValue * weights[2];
 		
@@ -133,24 +160,46 @@ public class Raster {
 		
 	}
 	
+	public static float areaOfTriangle2(Vector a, Vector b, Vector c){
+		
+		Vector AB = b.minus(a);
+		Vector AC = c.minus(a);
+		
+		return AB.cross2(AC) * 0.5f;
+		
+	}
+	
 	public static boolean isInsideTriangle(Vector a, Vector b, Vector c, Vector point){
 		
 		Vector side1 = b.minus(a);
 		Vector side2 = c.minus(b);
 		Vector side3 = a.minus(c);
 		
-		Vector AP = point.minus(a);
+//		Vector AP = point.minus(a);
 		
-		if(AP.cross(side1).z() > 0)
+//		if(AP.cross(side1).z() > 0)
+//			return false;
+//		
+//		
+//		Vector BP = point.minus(b);
+//		if(BP.cross(side2).z() > 0)
+//			return false;
+//		
+//		Vector CP = point.minus(c);
+//		if(CP.cross(side3).z() > 0)
+//			return false;
+		
+		Vector AP = point.minus(a);
+		if(AP.cross2(side1) > 0)
 			return false;
 		
 		
 		Vector BP = point.minus(b);
-		if(BP.cross(side2).z() > 0)
+		if(BP.cross2(side2) > 0)
 			return false;
 		
 		Vector CP = point.minus(c);
-		if(CP.cross(side3).z() > 0)
+		if(CP.cross2(side3) > 0)
 			return false;
 		
 		return true;
@@ -231,18 +280,30 @@ public class Raster {
 			
 				Vector point = new Vector(x, y, 0);
 				
+//				Vector AP = point.minus(a);
+//				
+//				if(AP.cross(side1).z() > 0)
+//					continue;
+//				
+//				
+//				Vector BP = point.minus(b);
+//				if(BP.cross(side2).z() > 0)
+//					continue;
+//				
+//				Vector CP = point.minus(c);
+//				if(CP.cross(side3).z() > 0)
+//					continue;
 				Vector AP = point.minus(a);
-				
-				if(AP.cross(side1).z() > 0)
+				if(AP.cross2(side1) > 0)
 					continue;
 				
 				
 				Vector BP = point.minus(b);
-				if(BP.cross(side2).z() > 0)
+				if(BP.cross2(side2) > 0)
 					continue;
 				
 				Vector CP = point.minus(c);
-				if(CP.cross(side3).z() > 0)
+				if(CP.cross2(side3) > 0)
 					continue;
 				
 				pointsInTriangle.add(new int[]{x, y});
