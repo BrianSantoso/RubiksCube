@@ -644,8 +644,10 @@ public class RubiksCube implements CubeComponent{
 						if(Math.abs(accumulatedRadians) > minRadians){
 							
 							// counter clockwise is defined reversely for axis 3, 4, and 5, so flip the rotation direction if it is 3 4 or 5
-							makeMove(sector, (lockedRotationAxisIndex > 2) ^ (dragDirection.cross(rotationAxis).z() < 0));
 							
+							//makeMove(sector, (lockedRotationAxisIndex > 2) ^ (dragDirection.cross(rotationAxis).z() < 0));
+							
+							makeMove(sector, (lockedRotationAxisIndex > 2) ^ (cc < 0));
 							interpolateFace(sector, rotationAxis, cc * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
 							
 							
