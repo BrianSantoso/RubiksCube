@@ -21,7 +21,16 @@ public class RubiksCube implements CubeComponent{
 	
 	private LinkedList<Move> moves;
 	
-	private boolean turning;
+	private Sticker selectedSticker;
+	private StickerData selectedStickerData;
+	private boolean dragging;
+	private boolean lockDirection;
+	private float minDragDistance1;
+	private float minDragDistance2;
+	private int lockedRotationAxisIndex;
+	
+	private float rotationSensitivity;
+	private float translationSensitivity;
 	
 	
 	public RubiksCube(int n, float scalar){
@@ -33,7 +42,7 @@ public class RubiksCube implements CubeComponent{
 		//pos = new Vector(0, 0, -15 -(float)(n - 1)/2);
 		
 		pos = new Vector(0, 0, -12.7729f - z);
-		axis = new Vector[]{ Vector.RIGHT, Vector.UP, Vector.BACK }; // might replace forward with backwards and vice versa
+		axis = new Vector[]{ Vector.RIGHT, Vector.UP, Vector.BACK, Vector.LEFT, Vector.DOWN, Vector.FORWARD }; // might replace forward with backwards and vice versa
 		
 		
 		colorSchemes = new int[][]{
@@ -145,6 +154,16 @@ public class RubiksCube implements CubeComponent{
 		//stickerManager.rotateFaceStickers(0, true);
 		
 		//stickerManager.rotateStickerData(new int[]{1, 2}, true);
+		
+		rotationSensitivity = 0.02f;
+		translationSensitivity = 0.05f;
+		selectedSticker = null;
+		selectedStickerData = null;
+		dragging = false;
+		lockedRotationAxisIndex = -100;
+		minDragDistance1 = 10;
+		minDragDistance2 = 40;
+		
 	}
 	
 	public void highlight(int[] sector){
@@ -510,119 +529,292 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
+	public boolean stickerSelected(){
+		
+		return selectedSticker != null;
+		
+	}
+	
+	public void resetSelectionData(){
+		
+		selectedSticker = null;
+		selectedStickerData = null;
+		dragging = false;
+		lockedRotationAxisIndex = -100;
+		
+	}
+	
+	public void lockRotationAxisIndex(int index){
+		
+		lockedRotationAxisIndex = index;
+		
+	}
+	
+	public boolean rotationAxisLocked(){
+		
+		return lockedRotationAxisIndex >= 0;
+		
+	}
+	
+	public void selectSticker(Sticker selectedSticker){
+		
+		this.selectedSticker = selectedSticker;
+		selectedStickerData = stickerManager.getStickerData(selectedSticker);
+		
+	}
+	
 	public void keyInputs(Mouse mouse){
 		
-		//applyTransformation(Matrix.translationMatrix(-0.000001f, 0, 0));
-		
 		Vector direction = mouse.getDirection();
-		//System.out.println(direction);
+		Vector normalizedDirection = direction.normalize();
 		
-		float rotationSensitivity = 0.02f;		
-		float translationSensitivity = 0.05f;
+		Vector dragDirection = mouse.getDragDirection();
+		Vector normalizedDragDirection = dragDirection.normalize();
 		
 		if(mouse.left()){
 			
 			rotateCube(new EAngle(-direction.y() * rotationSensitivity, direction.x() * rotationSensitivity, 0));
 			
-			
-			//destroy(0.5f);
-			
 		}
 		
 		if(mouse.right()){
 			
-			//System.out.println(Game.renderer.getSize());
-			
-			Ray ray = mouse.getRay();
-			
-			Sticker sticker = whichSticker(ray);
-			
-			//rotateFace(new int[]{1, 0}, axis[1], 0.1f);
-			//rotateFace(new int[]{2, 2}, axis[2], 0.1f);
-			
-			if(sticker == null){
+			if(stickerSelected()){
 				
-				//moveCube(direction.scale(translationSensitivity));
-				
-				//rotateFace(new EAngle(0, 0.01f, 0), new int[]{1, 0});
-				
-				
-			} else {
-				int[] via = sticker.getVertexIndexArray();
-				//Game.renderer.getVertex(via[0]).setRGB(0xabcdef);
-				//System.out.println(ray);
-				
-				
-				//System.out.println(ray);
-				
-				//System.out.println(Game.renderer.getVertex(via[0]).getRGB() + " coords:  " + sticker.getStickerCoordinates()[0] + " , " + sticker.getStickerCoordinates()[1]);
-			
-				//for(int x : via) System.out.print(x + " "); System.out.println();
-				//for(int x : via) Game.renderer.getVertex(x).setRGB(0xabcdef);
-//			
-//				int[] c = sticker.getStickerCoordinates();
-//				StickerData sd = stickerManager.getNet()[c[0]][c[1]];
-				
-				StickerData sd = stickerManager.getStickerData(sticker);
-				System.out.println("axis: " + sd.getAxis()[0] + " , " + sd.getAxis()[1]);
-				
-				ArrayList<int[]> sectors = sd.getSectors();
-				System.out.println("sector: ");
-				for(int[] sector : sectors){
+				if(rotationAxisLocked()){
 					
-					for(int x : sector) System.out.print(x + " ");
-					System.out.println();
+					int[] sector = selectedStickerData.getSectors().get(lockedRotationAxisIndex % 3);
 					
-				}
-				
-				Vector dragDirection = mouse.getDragDirection();
-				
-				
-				System.out.println("dragDirection: " + dragDirection);
-				
-				
-				float minDistance = 30;
-				
-				if(dragDirection.getMagnitudeSquared() > minDistance * minDistance){
-				
-					System.out.println("YEEET");
-					Vector normalizedDirection = dragDirection.normalize();
-					System.out.println("normalized: " + normalizedDirection);
+					Vector rotationAxis = axis[lockedRotationAxisIndex];
 					
-					int whichAxisIndex = whichAxis(normalizedDirection, sd.getAxis());
-					Vector rotationAxis = axis[whichAxisIndex];
+//					//do not need to normalize dot product because we just want the sign
+//					float dot = direction.dot(rotationAxis);
+//					System.out.println("dot: " + dot);
+					//float cc = dot > 0 ? 1 : -1;	// Positive or Negative means CC or C
 					
-					System.out.println("WHICH AXIS INDEX: " + whichAxisIndex);
-					int[] sector = sd.getSectors().get(whichAxisIndex);
+					float cross = direction.cross(rotationAxis).z();
+					float cc = cross > 0 ? 1 : -1;
+					System.out.println("cross: " + cross);
 					
-					if(direction.getMagnitudeSquared() > 1 * 1){
+					float radians = direction.getMagnitude() * rotationSensitivity * cc;
 					
-						float dot = direction.normalize().dot(rotationAxis);
-						float cc = -dot / Math.abs(dot);
+					rotateFace(sector, rotationAxis, radians);
+					
+					
+				} else {
+					
+					if(dragDirection.getMagnitudeSquared() >= minDragDistance1 * minDragDistance1){
 						
-						makeMove(sector, cc > 0);
-						//rotateFace(sector, rotationAxis, (float) direction.getMagnitude() * rotationSensitivity * cc);
+						int[] axisIndices = selectedStickerData.getAxis();
+						
+						System.out.println(axisIndices[0] + " , " + axisIndices[1]);
+						
+						// THESE DOT PRODUCTS ARE NORMALIZED FOR THE SAKE OF COMPARISON
+						float dot1 = axis[axisIndices[0]].dot(normalizedDragDirection);
+						float dot2 = axis[axisIndices[1]].dot(normalizedDragDirection);
+						
+						int whichAxisToLock = Math.abs(dot1) < Math.abs(dot2) ? axisIndices[0] : axisIndices[1];
+						
+						System.out.println("locked axis index: " + whichAxisToLock);
+						//DONT DO THIS: lock rotation around general axis. use dot product to determine which direction		
+						lockRotationAxisIndex(whichAxisToLock);
+						
 						
 					}
 					
 				}
 				
+			} else {
 				
+				Ray ray = mouse.getRay();
+				Sticker requestedStickerSelection = whichSticker(ray);
 				
-				// sector, axis, radians
-				//rotateFace(sd.getSectors().get(0), axis[sd.getAxis()[0]], 0.1f);
-				
+				if(requestedStickerSelection != null)
+					selectSticker(requestedStickerSelection);
 				
 			}
 			
+		} else {
 			
-			//System.out.println(sticker);
-			
-			//System.out.println(mouse.getRay());
+			resetSelectionData();
 			
 		}
 		
+		
 	}
+	
+//	public void keyInputs(Mouse mouse){
+//		
+//		Vector direction = mouse.getDirection();
+//		//System.out.println(direction);
+//		
+//		if(mouse.left())
+//			rotateCube(new EAngle(-direction.y() * rotationSensitivity, direction.x() * rotationSensitivity, 0));
+//			
+//		
+//		if(mouse.right()){		
+//			
+//			
+//			if(dragging){
+//				
+//				if(selectedSticker == null){
+//					
+//				} else {
+//					
+//					Vector dragDirection = mouse.getDragDirection();
+//					System.out.println(dragDirection);
+//					
+//					if(lockDirection){
+//						
+//						Vector normalizedDirection = dragDirection.normalize();
+//						int whichAxisIndex = whichAxis(normalizedDirection, selectedStickerData.getAxis());
+//						Vector rotationAxis = axis[whichAxisIndex];
+//						
+//						System.out.println("WHICH AXIS INDEX: " + whichAxisIndex);
+//						int[] sector = selectedStickerData.getSectors().get(whichAxisIndex % 3);
+//						
+//						if(direction.getMagnitudeSquared() > 5 * 1){
+//						
+//							//System.out.println(dragDirection);
+//							
+//							float dot = normalizedDirection.normalize().dot(rotationAxis);
+//							float cc = -dot / Math.abs(dot);
+//							
+////							makeMove(sector, cc < 0);
+////							selectedSticker = null;
+////							selectedStickerData = null;
+////							dragging = false;
+////							lockDirection = false;
+//							rotateFace(sector, rotationAxis, (float) direction.getMagnitude() * rotationSensitivity * cc);
+//							
+//						}
+//						
+//					} else {
+//				
+//						
+//						System.out.println("dragDirecton: " + dragDirection);
+//						
+//						if(dragDirection.getMagnitudeSquared() > minDragDistance1 * minDragDistance1){
+//							
+//							System.out.println("Greater than minDragDistance1");
+//							lockDirection = true;
+//							
+//							
+//							
+//							//rotateFace();
+//							
+//						} else {
+//							
+//							lockDirection = false;
+//							
+//						}
+//					}
+//					
+//				}
+//				
+//			} else {
+//				
+//			
+//				if(selectedSticker == null){
+//					
+//					Ray ray = mouse.getRay();
+//					selectedSticker = whichSticker(ray);
+//					
+//					if(selectedSticker != null)
+//						selectedStickerData = stickerManager.getStickerData(selectedSticker);
+//					
+//					
+//					//rotateFace(new EAngle(0, 0.01f, 0), new int[]{1, 0});
+//					
+//					
+//				} else {
+//					
+//					int[] via = selectedSticker.getVertexIndexArray();
+//					for(int x : via) Game.renderer.getVertex(x).setRGB(0xabcdef);	// remove later
+//					
+//					//StickerData sd = stickerManager.getStickerData(selectedSticker);
+//					
+//					//System.out.println("axis: " + sd.getAxis()[0] + " , " + sd.getAxis()[1]);
+//					
+////					ArrayList<int[]> sectors = sd.getSectors();
+//	//				System.out.println("sector: ");
+//	//				for(int[] sector : sectors){
+//	//					
+//	//					for(int x : sector) System.out.print(x + " ");
+//	//					System.out.println();
+//	//					
+//	//				}
+//					
+//					
+//					
+//					
+//					
+//					
+////					Vector dragDirection = mouse.getDragDirection();
+////					
+////					
+////					System.out.println("dragDirection: " + dragDirection);
+////					
+////					
+////					float minDistance = 30;
+////					
+////					if(dragDirection.getMagnitudeSquared() > minDistance * minDistance){
+////					
+////						System.out.println("YEEET");
+////						Vector normalizedDirection = dragDirection.normalize();
+////						System.out.println("normalized: " + normalizedDirection);
+////						
+////						int whichAxisIndex = whichAxis(normalizedDirection, sd.getAxis());
+////						Vector rotationAxis = axis[whichAxisIndex];
+////						
+////						System.out.println("WHICH AXIS INDEX: " + whichAxisIndex);
+////						int[] sector = sd.getSectors().get(whichAxisIndex);
+////						
+////						if(direction.getMagnitudeSquared() > 1 * 1){
+////						
+////							float dot = direction.normalize().dot(rotationAxis);
+////							float cc = -dot / Math.abs(dot);
+////							
+////							makeMove(sector, cc > 0);
+////							//rotateFace(sector, rotationAxis, (float) direction.getMagnitude() * rotationSensitivity * cc);
+////							
+////						}
+////						
+////					}
+//					
+//					
+//					
+//					
+//					
+//					
+//					
+//					
+//					
+//				}
+//				
+//				
+//				
+//				
+//			}
+//			
+//			// say dragging even if not clicking a sticker
+//			dragging = true;
+//			
+//			System.out.println(selectedSticker);
+//			
+//			//if(selectedSticker == null)
+//			//	moveCube(direction.scale(translationSensitivity));
+//			
+//		} else {
+//			
+//			selectedSticker = null;
+//			selectedStickerData = null;
+//			dragging = false;
+//			lockDirection = false;
+//			
+//		}
+//		
+//	}
 	
 	public int whichAxis(Vector normalizedMouseDirection, int[] axisIndices){
 		
@@ -631,8 +823,45 @@ public class RubiksCube implements CubeComponent{
 		Vector axis1 = axis[axisIndices[0]];
 		Vector axis2 = axis[axisIndices[1]];
 		
+		Vector axis3 = axis[axisIndices[0] + 3];
+		Vector axis4 = axis[axisIndices[1] + 3];
+		
+		float[] dots = new float[]{
+				
+				axis1.dot(normalizedMouseDirection),
+				axis2.dot(normalizedMouseDirection),
+				axis3.dot(normalizedMouseDirection),
+				axis4.dot(normalizedMouseDirection)
+				
+		};
+		
+		int[] indices = new int[]{
+				
+				axisIndices[0],
+				axisIndices[1],
+				axisIndices[0] + 3,
+				axisIndices[1] + 3
+				
+		};
+		
+		int index = 0;
+		float closestToZero = Math.abs(dots[index]);
+		
+		for(int rep = 0; rep < dots.length; rep++){
+			
+			if(dots[rep] < closestToZero){
+				
+				index = rep;
+				closestToZero = Math.abs(dots[rep]);
+				
+			}
+			
+		}
+		
+		return indices[index];
+		
 		//Vector projectedAxis1 = axis.project();
-		return Math.abs(normalizedMouseDirection.dot(axis1)) < Math.abs(normalizedMouseDirection.dot(axis2)) ? axisIndices[0] : axisIndices[1];
+		//return Math.abs(normalizedMouseDirection.dot(axis1)) < Math.abs(normalizedMouseDirection.dot(axis2)) ? axisIndices[0] : axisIndices[1];
 		
 	}
 	

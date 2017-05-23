@@ -13,7 +13,8 @@ public class StickerData {
 	
 	public StickerData(int face, int[] stickerCoordinates, ArrayList<int[]> sectors){
 		
-		axis = new int[]{ (face + 1) % 3, (face + 2) % 3 };	// The 2 parallel axis to this Sticker
+		//axis = new int[]{ ((face + 1) % 3), (face + 2) % 3 };	// The 2 parallel axis to this Sticker
+		axis = new int[]{ ((face + 1) % 3) + (face > 2 ? 3 : 0), ((face + 2) % 3 ) + (face > 2 ? 3 : 0)};	// The 2 parallel axis to this Sticker
 		
 		this.sectors = sectors;
 		this.stickerCoordinates = stickerCoordinates;
