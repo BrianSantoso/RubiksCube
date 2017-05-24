@@ -175,20 +175,6 @@ public class Raster {
 		Vector side2 = c.minus(b);
 		Vector side3 = a.minus(c);
 		
-//		Vector AP = point.minus(a);
-		
-//		if(AP.cross(side1).z() > 0)
-//			return false;
-//		
-//		
-//		Vector BP = point.minus(b);
-//		if(BP.cross(side2).z() > 0)
-//			return false;
-//		
-//		Vector CP = point.minus(c);
-//		if(CP.cross(side3).z() > 0)
-//			return false;
-		
 		Vector AP = point.minus(a);
 		if(AP.cross2(side1) > 0)
 			return false;

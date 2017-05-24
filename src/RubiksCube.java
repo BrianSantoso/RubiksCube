@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class RubiksCube implements CubeComponent{
@@ -44,6 +45,10 @@ public class RubiksCube implements CubeComponent{
 		this.n = Math.max(n, 1);
 		this.size = 4.2f / n * scalar;
 		
+		//System.out.println(size);
+		
+		//this.size = 4.2f / n;
+		
 		float z = new Vector(1, 1, 1).scale((float)(this.n - 1)/2).getMagnitude();
 		//pos = new Vector(0, 0, -15 -(float)(n - 1)/2);
 		
@@ -81,18 +86,6 @@ public class RubiksCube implements CubeComponent{
 		
 		colorScheme = colorSchemes[1];
 		
-//		color = 0xffffff;
-//		colorScheme = new int[]{
-//				
-//				0, // 0: Orange. Right Face.
-//				1, // 1: White. Up Face.
-//				2, // 2: Blue. Front Face.
-//				3, // 3: Red. Left Face.
-//				4, // 4: Yellow. Down Face.
-//				5, // 5: Green. Back Face.
-//				
-//		};
-		
 		stickerManager = new StickerManager(this.n);
 		
 		// Polynomial expressing number of pieces of an n x n x n cube:
@@ -105,61 +98,6 @@ public class RubiksCube implements CubeComponent{
 		
 		moves = new LinkedList<Move>();
 		
-		float t = (float) (n - 1) / 2;
-//		turnCCMatrices = new Matrix[]{ 
-//				
-//				Matrix.translationMatrix(0, t, t).multiply(Matrix.xAxisRotation90CC).multiply(Matrix.translationMatrix(0, -t, -t)),
-//				Matrix.translationMatrix(t, 0, t).multiply(Matrix.yAxisRotation90CC).multiply(Matrix.translationMatrix(-t, 0, -t)),
-//				Matrix.translationMatrix(t, t, 0).multiply(Matrix.zAxisRotation90CC).multiply(Matrix.translationMatrix(-t, -t, 0)),
-//				
-//				Matrix.translationMatrix(0, t, t).multiply(Matrix.xAxisRotation90C).multiply(Matrix.translationMatrix(0, -t, -t)),
-//				Matrix.translationMatrix(t, 0, t).multiply(Matrix.yAxisRotation90C).multiply(Matrix.translationMatrix(-t, 0, -t)),
-//				Matrix.translationMatrix(t, t, 0).multiply(Matrix.zAxisRotation90C).multiply(Matrix.translationMatrix(-t, -t, 0)),
-//				
-//		};
-		
-		
-		rotateCube(new EAngle((float) Math.PI/4, (float) Math.PI/4, 0));
-		
-		//moveCube(new Vector(-3f, 0, 0));
-		
-//		Matrix translation1 = Matrix.translationMatrix(pos.scale(-1));
-//		Matrix rotation = Matrix.xAxisRotationMatrix(-1f);
-//		Matrix rotation2 = Matrix.yAxisRotationMatrix(-1f);
-//		Matrix translation2 = Matrix.translationMatrix(pos);
-//		
-//		Matrix transformation = translation2.multiply(rotation).multiply(rotation2).multiply(translation1);
-//		
-//		applyTransformation(transformation);
-		
-//		Matrix translation01 = Matrix.translationMatrix(pos.scale(-1));
-//		Matrix rotation0 = Matrix.xAxisRotationMatrix(1f);
-//		Matrix rotation02 = Matrix.yAxisRotationMatrix(1f);
-//		Matrix translation02 = Matrix.translationMatrix(pos);
-//		
-//		Matrix transformation0 = translation2.multiply(rotation02).multiply(rotation0).multiply(translation1);
-//		
-//		applyTransformation(transformation0);
-		
-		//System.out.println(stickerManager.isSolved());
-		
-//		makeMove(new int[]{0, 2}, true);
-//		makeMove(new int[]{1, 2}, true);
-//		makeMove(new int[]{0, 2}, false);
-//		makeMove(new int[]{1, 2}, false);
-	
-		//System.out.println(stickerManager.isSolved());
-		//highlight(new int[]{1, 2});
-		
-		//for(int rep = 0; rep < 100; rep++) destroy(0.2f);
-		
-		//makeMove(new int[]{1, 0}, true);
-		//stickerManager.rotateFaceStickers(4, true);
-		
-		//makeMove(new int[]{0, 2}, true);
-		//stickerManager.rotateFaceStickers(0, true);
-		
-		//stickerManager.rotateStickerData(new int[]{1, 2}, true);
 		
 		rotationSensitivity = 0.02f;
 		translationSensitivity = 0.05f;
@@ -176,8 +114,30 @@ public class RubiksCube implements CubeComponent{
 		animationQueue = new ArrayList<AnimationData>();
 		accumulationTime = 0;
 		
+		rotateCube(new EAngle((float) Math.PI/4, (float) Math.PI/4, 0));
 		
-		//makeMove(new int[]{0, 2}, true);
+		for(int rep = 0; rep < 20; rep++) makeMove(getRandomMove(true));
+		//makeMove(getRandomMove(true));
+		//makeMove(getRandomMove(true));
+		
+		//makeMove(new int[]{0, 2}, true, true);
+		//makeMove(new int[]{0, 2}, true, true);
+			
+	}
+	
+	public Move getRandomMove(boolean animated){
+		
+		int[] randomSector = new int[]{
+				
+				(int) (Math.random() * 3),
+				(int) (Math.random() * n)
+				
+		};
+		
+		boolean randomCC = Math.random() < 0.5;
+		
+		return new Move(randomSector, randomCC, animated);
+		
 	}
 	
 	public void highlight(int[] sector){
@@ -380,18 +340,101 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
-	public void makeMove(int[] sector, boolean cc){
+	
+//	public void makeMove(int[] sector, boolean cc, boolean animated){
+//		
+//		rotateSectorData(sector, cc);	
+//		stickerManager.rotateStickerData(sector, cc);
+//		
+//		lockedRotationAxisIndex = sector[0];
+//		float cc2 = lockedRotationAxisIndex > 2 ^ cc ? -1 : 1;
+//		
+//		if(animated){
+//			
+//			interpolateFace(sector, lockedRotationAxisIndex, cc2 * ((float)(Math.PI / 2) - Math.abs(accumulatedRadians)));
+//			
+//		} else {
+//			
+//			rotateFace(sector, lockedRotationAxisIndex, (float) Math.PI/2 * cc2);
+//			
+//		}
+//		
+//		resetSelectionData();
+//		
+//	}
+	
+	
+	public void makeMove(int[] sector, boolean cc, boolean animated){
 		
-		rotateSectorData(sector, cc);
 		
-		stickerManager.rotateStickerData(sector, cc);
-
-		System.out.println("MOVE MADE");
 		
-		//if(!animated) rotateFace(sector, axis[sector[0]], (float) Math.PI/2 * (cc ? -1 : 1));
+		lockedRotationAxisIndex = sector[0];
+		float cc2 = lockedRotationAxisIndex > 2 ^ cc ? -1 : 1;
+		
+		if(animated){
+			
+			interpolateFace(sector, lockedRotationAxisIndex, cc2 * ((float)(Math.PI / 2) - Math.abs(accumulatedRadians)), new Move(sector, cc, false));
+			
+		} else {
+			
+			rotateSectorData(sector, cc);	
+			stickerManager.rotateStickerData(sector, cc);
+			
+			moves.add(new Move(sector, cc, false));
+			//rotateFace(sector, lockedRotationAxisIndex, (float) Math.PI/2 * cc2);
+			
+		}
+		
+		resetSelectionData();
 		
 	}
 	
+	public void makeMove(Move move){
+		
+		makeMove(move.getSector(), move.isCc(), move.isAnimated());
+		
+	}
+	
+//	public void makeMove(int[] sector, boolean cc){
+//		
+//		rotateSectorData(sector, cc);
+//		
+//		stickerManager.rotateStickerData(sector, cc);
+//
+//		System.out.println("MOVE MADE");
+//		
+//		//if(!animated) rotateFace(sector, axis[sector[0]], (float) Math.PI/2 * (cc ? -1 : 1));
+//		
+//	}
+	
+//	public void makeMove(int[] sector, boolean cc, float cc2){
+//		
+//		rotateSectorData(sector, cc);
+//		stickerManager.rotateStickerData(sector, cc);
+//		interpolateFace(sector, lockedRotationAxisIndex, cc2 * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
+//		
+//	}
+//	
+//	public void makeMove(int[] sector, boolean cc, boolean animated){
+//		
+//		float cc2 = lockedRotationAxisIndex > 2 ^ cc ? -1 : 1;
+//		
+//		if(animated){
+//			
+//			rotateSectorData(sector, cc);
+//			stickerManager.rotateStickerData(sector, cc);
+//			interpolateFace(sector, lockedRotationAxisIndex, cc2 * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
+//			
+//			
+//		} else {
+//			
+//			rotateSectorData(sector, cc);
+//			stickerManager.rotateStickerData(sector, cc);
+//			rotateFace(sector, axis[sector[0]], (float) Math.PI/2 * cc2);
+//			
+//		}	
+//		
+//	}
 	
 	public void rotateSectorData(int[] sector, boolean cc){
 		
@@ -601,6 +644,22 @@ public class RubiksCube implements CubeComponent{
 		
 	}
 	
+	public void interpolateFace(int[] sector, int axisIndex, float radians, Move move){
+		
+		float radiansPerAnimation = radians / animationFrames;
+		
+		for(int rep = 0; rep < animationFrames; rep++){
+			
+			if(rep == animationFrames - 1){
+				animationQueue.add(0, new AnimationData(sector, axisIndex, radiansPerAnimation, move));
+			} else {
+				animationQueue.add(0, new AnimationData(sector, axisIndex, radiansPerAnimation));
+			}
+			
+		}
+		
+	}
+	
 	public boolean isAnimating(){
 		
 		return animationQueue.size() > 0;
@@ -615,16 +674,22 @@ public class RubiksCube implements CubeComponent{
 		Vector dragDirection = mouse.getDragDirection();
 		Vector normalizedDragDirection = dragDirection.normalize();
 		
+		if(mouse.left()){
+			
+			rotateCube(new EAngle(-direction.y() * rotationSensitivity, direction.x() * rotationSensitivity, 0));
+			
+		}
+		
 		if(!isAnimating()){
 			
 			// put this part under !isAnimating() because the interpolated animation rotates 
 			// around a given Vector axis and the axis will change as the cube rotates
 			// so instead i should be using the axis index ?
-			if(mouse.left()){
-				
-				rotateCube(new EAngle(-direction.y() * rotationSensitivity, direction.x() * rotationSensitivity, 0));
-				
-			}
+//			if(mouse.left()){
+//				
+//				rotateCube(new EAngle(-direction.y() * rotationSensitivity, direction.x() * rotationSensitivity, 0));
+//				
+//			}
 		
 		
 			
@@ -653,10 +718,20 @@ public class RubiksCube implements CubeComponent{
 							
 							// counter clockwise is defined reversely for axis 3, 4, and 5, so flip the rotation direction if it is 3 4 or 5
 							
-							//makeMove(sector, (lockedRotationAxisIndex > 2) ^ (dragDirection.cross(rotationAxis).z() < 0));
 							
-							makeMove(sector, (lockedRotationAxisIndex > 2) ^ (cc < 0));
-							interpolateFace(sector, lockedRotationAxisIndex, cc * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
+							makeMove(sector, (lockedRotationAxisIndex > 2) ^ (cc < 0), true);
+							
+							//makeMove(sector, (lockedRotationAxisIndex > 2) ^ (cc < 0), accumulatedRadians);
+							
+							
+							//makeMove(sector, (lockedRotationAxisIndex > 2) ^ (cc < 0), cc);
+							
+							//makeMove(sector, (lockedRotationAxisIndex > 2) ^ (cc < 0), true);
+							
+							// cierto
+							//makeMove(sector, (lockedRotationAxisIndex > 2) ^ (cc < 0));
+							//interpolateFace(sector, lockedRotationAxisIndex, cc * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
+							
 							//interpolateFace(sector, rotationAxis, cc * ((float) (Math.PI / 2) - Math.abs(accumulatedRadians)));
 							
 							
@@ -953,10 +1028,15 @@ public class RubiksCube implements CubeComponent{
 			//should store axis index huh?
 			rotateFace(a.getSector(), a.getAxisIndex(), a.getRadians());
 			//rotateFace(a.getSector(), a.getAxis(), a.getRadians());
-			
+			if(a.hasMove()){
+				
+				makeMove(a.getMove());
+				//System.out.println(a.getMove().isAnimated());
+			}
 			animationQueue.remove(0);
 			
 		}
+		
 		
 		//destroy(0.2f);
 		//destroy(0.1f);

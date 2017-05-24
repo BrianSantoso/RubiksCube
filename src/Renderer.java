@@ -128,24 +128,11 @@ public class Renderer {
 				
 				if(zBuffering){
 					
-					//System.out.println(p[0]);
-					
 					Vector point = new Vector(
 						(float) p[0] / raster.getWidth(),
 						(float) p[1] / raster.getHeight(),
 						-1
 					);
-					
-					//if(!Raster.isInsideTriangle(a, b, c, point)) continue;
-					
-					
-					
-					
-//					float[] weights = Raster.barycentricWeights(a, b, c, point);
-//					depth = 1f / ( (1f / v0.getZ()) * weights[0] + (1f / v1.getZ()) * weights[1] + (1f / v2.getZ()) * weights[2]);
-					
-					
-					// I thought this was right
 					
 					depth = 1f / Raster.barycentricInterpolation2(
 						a, 1f / v0.getZ(),
@@ -154,27 +141,9 @@ public class Renderer {
 						point
 					);
 					
-					
-					//if(v0.getRGB() == 0) System.out.println(depth);
-//					
-//					depth = 1f / Raster.barycentricInterpolation(
-//						v0.getPos().toVector(), 1f / v0.getZ(),
-//						v1.getPos().toVector(), 1f / v1.getZ(),
-//						v2.getPos().toVector(), 1f / v2.getZ(),
-//						point
-//					);
 				}
 				
 				raster.tryToSetPixel(p[0], p[1], v0.getRGB(), depth);
-				
-				
-				//raster.tryToSetPixel(p[0], p[1], v0.getRGB(), 0);
-				
-				
-				
-				
-//				float[] bw = Raster.barycentricWeights(a, b, c, new Vector(p[0]/raster.getWidth(), p[1]/raster.getHeight(), -1));
-//				raster.tryToSetPixel(p[0], p[1], (int) (v0.getRGB() * bw[0] + v1.getRGB() * bw[1] + v2.getRGB() * bw[2]), 0);
 				
 			}
 			

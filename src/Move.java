@@ -3,11 +3,13 @@ public class Move {
 
 	private int[] sector;
 	private boolean cc;
+	private boolean animated;
 	
-	public Move(int[] sector, boolean cc){
+	public Move(int[] sector, boolean cc, boolean animated){
 		
 		this.sector = sector;
 		this.cc = cc;
+		this.animated = animated;
 		
 	}
 
@@ -29,8 +31,16 @@ public class Move {
 	
 	public Move getInverse(){
 		
-		return new Move(sector, !cc);
+		return new Move(sector, !cc, animated);
 		
+	}
+
+	public boolean isAnimated() {
+		return animated;
+	}
+
+	public void setAnimated(boolean animated) {
+		this.animated = animated;
 	}
 	
 }

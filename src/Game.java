@@ -8,7 +8,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class Game extends Canvas implements Runnable{
 	
@@ -19,6 +21,7 @@ public class Game extends Canvas implements Runnable{
 	private final int scale;
 	
 	private Thread thread;
+	private JPanel panel;
 	private JFrame frame;
 	private boolean running;
 	
@@ -66,13 +69,25 @@ public class Game extends Canvas implements Runnable{
 		
 		
 		frame = new JFrame();
+		panel = new JPanel();
+		
+		JButton button = new JButton("click me");
+		panel.add(button);
+		frame.add(panel);
+		frame.setLocationRelativeTo(null);
+		
 		frame.setResizable(false);
 		frame.setTitle(title);
 		frame.add(this);
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		
+		
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		
+		
 		
 		
 		keyboard = new Keyboard();
@@ -84,7 +99,7 @@ public class Game extends Canvas implements Runnable{
 		addMouseListener(mouse);
 		
 		//cc
-		rubiksCube = new RubiksCube(4, 1f);
+		rubiksCube = new RubiksCube(3, 1f);
 		//new RubiksCube(3, 1.4f);
 		
 	}
@@ -236,7 +251,7 @@ public class Game extends Canvas implements Runnable{
 		
 		
 		
-		Game game = new Game(800, 800, 1, 1f/60, "THIS IS AN ABSTRACTION");
+		Game game = new Game(600, 600, 1, 1f/60, "RubiksCube (NxNxN) by Brian Santoso");
 		game.start();
 		
 		
