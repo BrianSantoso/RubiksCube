@@ -98,7 +98,6 @@ public class RubiksCube implements CubeComponent{
 		
 		moves = new LinkedList<Move>();
 		
-		
 		rotationSensitivity = 0.02f;
 		translationSensitivity = 0.05f;
 		selectedSticker = null;
@@ -115,14 +114,35 @@ public class RubiksCube implements CubeComponent{
 		accumulationTime = 0;
 		
 		rotateCube(new EAngle((float) Math.PI/4, (float) Math.PI/4, 0));
-		
-		for(int rep = 0; rep < 20; rep++) makeMove(getRandomMove(true));
 		//makeMove(getRandomMove(true));
 		//makeMove(getRandomMove(true));
 		
 		//makeMove(new int[]{0, 2}, true, true);
 		//makeMove(new int[]{0, 2}, true, true);
 			
+		scramble(len);
+	}
+	
+	public void undo(){
+		
+		
+		
+	}
+	
+	public void redo(){
+		
+		
+		
+	}
+	
+	public void scramble(int numMoves){
+		
+		for(int rep = 0; rep < numMoves; rep++){
+			
+			makeMove(getRandomMove(true));
+			
+		}
+		
 	}
 	
 	public Move getRandomMove(boolean animated){

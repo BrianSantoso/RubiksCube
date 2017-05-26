@@ -69,20 +69,18 @@ public class Game extends Canvas implements Runnable{
 		
 		
 		frame = new JFrame();
-		panel = new JPanel();
-		
-		JButton button = new JButton("click me");
-		panel.add(button);
-		frame.add(panel);
-		frame.setLocationRelativeTo(null);
+//		panel = new JPanel();
+//		
+//		JButton button = new JButton("click me");
+//		panel.add(button);
+//		frame.add(panel);
+//		frame.setLocationRelativeTo(null);
 		
 		frame.setResizable(false);
 		frame.setTitle(title);
 		frame.add(this);
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		
 		
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
@@ -99,7 +97,7 @@ public class Game extends Canvas implements Runnable{
 		addMouseListener(mouse);
 		
 		//cc
-		rubiksCube = new RubiksCube(3, 1f);
+		rubiksCube = new RubiksCube(4, 1f);
 		//new RubiksCube(3, 1.4f);
 		
 	}
