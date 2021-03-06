@@ -1,4 +1,4 @@
-# Rubiks Cube Simulator (v.1.17.1)
+# Open Cubes (v.1.17.1)
 
 An interactive Rubiks Cube simulator (NxNxN) in Java
 3D graphics engine written from scratch
